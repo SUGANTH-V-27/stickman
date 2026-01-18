@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=12 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://d0ao3ieetescq" path="res://scenes/enemy.tscn" id="2_0wfyh"]
@@ -7,23 +7,57 @@
 [ext_resource type="Texture2D" uid="uid://dvq61feydu0nm" path="res://assets/backgrounds/red_forest/3.png" id="5_ya4ey"]
 [ext_resource type="Texture2D" uid="uid://b8g8fw0rqkwn1" path="res://assets/backgrounds/red_forest/5.png" id="6_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://bm5qc5jcifkov" path="res://assets/backgrounds/red_forest/8.png" id="7_trceg"]
-[ext_resource type="Texture2D" uid="uid://naabfuqjqhix" path="res://assets/backgrounds/red_forest/7.png" id="8_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
+[ext_resource type="Texture2D" uid="uid://ol5sgcloprn" path="res://assets/backgrounds/red_forest/7-edited final.png" id="10_choun"]
+
+[sub_resource type="GDScript" id="GDScript_85g3d"]
+script/source = "extends Node2D
+
+
+func _process(delta: float) -> void:
+	# Get the camera node safely
+	var cam = get_node_or_null(\"player/CharacterBody2D/Camera2D\")
+	var bg = get_node_or_null(\"ParallaxBackground\")
+
+	if cam and bg:
+		# Use camera screen center for parallax scroll
+		var cam_pos = cam.get_camera_screen_center()
+		bg.scroll_offset = cam_pos
+
+		# Sequential mirroring logic
+		var cam_x = cam_pos.x
+		if cam_x >= 500:
+			bg.get_node(\"L1_Trees\").motion_mirroring.x = 1920
+		if cam_x >= 1000:
+			bg.get_node(\"L2_Trees\").motion_mirroring.x = 1920
+		if cam_x >= 1500:
+			bg.get_node(\"L3_Trees\").motion_mirroring.x = 1920
+		if cam_x >= 2000:
+			bg.get_node(\"L4_Trees\").motion_mirroring.x = 1920
+		if cam_x >= 2500:
+			bg.get_node(\"L5_Trees\").motion_mirroring.x = 1920
+		if cam_x >= 3000:
+			bg.get_node(\"L6_Trees_front\").motion_mirroring.x = 1920
+		if cam_x >= 3500:
+			bg.get_node(\"L7_Ground\").motion_mirroring.x = 1920
+"
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_85g3d"]
 size = Vector2(50000, 356)
 
 [node name="Node2D" type="Node2D"]
+script = SubResource("GDScript_85g3d")
 
 [node name="player" parent="." instance=ExtResource("1_o5qli")]
-position = Vector2(0, 359)
+position = Vector2(5300, 359)
 
 [node name="enemy" parent="." instance=ExtResource("2_0wfyh")]
-position = Vector2(-209, 362)
+position = Vector2(5800, 362)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
-scroll_limit_begin = Vector2(-4e+25, 0)
-scroll_limit_end = Vector2(4e+18, 0)
+scroll_limit_begin = Vector2(-1000000, 0)
+scroll_limit_end = Vector2(1000000, 0)
+scroll_ignore_camera_zoom = true
 
 [node name="L1_Sky_and_Sun" type="ParallaxLayer" parent="ParallaxBackground"]
 position = Vector2(1, 0)
@@ -33,7 +67,7 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L1_Sky_and_Sun"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(50, 540)
 texture = ExtResource("3_85g3d")
 
 [node name="L2_Fog" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -43,7 +77,7 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L2_Fog"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(100, 540)
 texture = ExtResource("4_choun")
 
 [node name="L3_Trees_Far" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -53,7 +87,7 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L3_Trees_Far"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(150, 540)
 texture = ExtResource("5_ya4ey")
 
 [node name="L4_Trees_Pre_Mid" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -63,7 +97,7 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L4_Trees_Pre_Mid"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(250, 540)
 texture = ExtResource("9_jkv2x")
 
 [node name="L5_Trees_Mid" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -73,7 +107,7 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L5_Trees_Mid"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(920, 540)
 texture = ExtResource("6_eb6dy")
 
 [node name="L6_Trees_front" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -83,22 +117,23 @@ motion_mirroring = Vector2(1980, 0)
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L6_Trees_front"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
+position = Vector2(900, 540)
 texture = ExtResource("7_trceg")
 
 [node name="L7_Ground" type="ParallaxLayer" parent="ParallaxBackground"]
-position = Vector2(1, 0)
+position = Vector2(0.5, 0)
 motion_scale = Vector2(1, 0)
 motion_mirroring = Vector2(1980, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L7_Ground"]
 texture_filter = 1
 texture_repeat = 2
-position = Vector2(0, 540)
-texture = ExtResource("8_a8y0u")
+position = Vector2(1000, 540)
+texture = ExtResource("10_choun")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 collision_mask = 0
+script = SubResource("GDScript_85g3d")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(914, 1183)
