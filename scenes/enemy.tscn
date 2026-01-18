@@ -139,24 +139,25 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_md0e3"]
-size = Vector2(187, 489)
+size = Vector2(47, 153)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qaulx"]
-size = Vector2(521.375, 241)
+size = Vector2(98, 34)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1f82d"]
-size = Vector2(294.25, 128.5)
+size = Vector2(75, 37)
 
 [node name="CharacterBody2D" type="CharacterBody2D" groups=["enemy"]]
 collision_layer = 2
 script = ExtResource("1_md0e3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_5uy6h")
 animation = &"death"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(2.5, 87.5)
+position = Vector2(5.5, 29.5)
 shape = SubResource("RectangleShape2D_md0e3")
 
 [node name="punchhitbox" type="Area2D" parent="."]
@@ -165,14 +166,14 @@ collision_layer = 8
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="punchhitbox"]
-position = Vector2(11, 74)
+position = Vector2(7, 16)
 shape = SubResource("RectangleShape2D_qaulx")
 
 [node name="attack_range" type="Area2D" parent="."]
 collision_layer = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="attack_range"]
-position = Vector2(15, 71)
+position = Vector2(8.5, 11.5)
 shape = SubResource("RectangleShape2D_1f82d")
 
 [connection signal="body_entered" from="punchhitbox" to="." method="_on_punchhitbox_body_entered"]
