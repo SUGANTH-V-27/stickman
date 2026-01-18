@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://cid21vx5nefym"]
+[gd_scene load_steps=43 format=3 uid="uid://cid21vx5nefym"]
 
 [ext_resource type="Script" uid="uid://rjcrddfk51cl" path="res://scenes/player.gd" id="1_ur7pv"]
 [ext_resource type="Texture2D" uid="uid://h21amjpsh51e" path="res://animations/death/death0000.png" id="2_pf23h"]
@@ -37,12 +37,13 @@
 [ext_resource type="Texture2D" uid="uid://cgfrkf34jxpao" path="res://animations/kick/kick0006.png" id="21_fdfoy"]
 [ext_resource type="Texture2D" uid="uid://baum7hnmmavp3" path="res://animations/kick/kick0007.png" id="22_hhpqf"]
 [ext_resource type="Texture2D" uid="uid://itifha86223h" path="res://animations/kick/kick0008.png" id="23_g5jhy"]
+[ext_resource type="Script" uid="uid://1iptrnyya2st" path="res://scenes/camera_shake.gd" id="38_t4otl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4r5pv"]
 size = Vector2(150, 472)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4ni07"]
-size = Vector2(355.57422, 136.58038)
+size = Vector2(246.5, 98.145096)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_l71n6"]
 animations = [{
@@ -186,7 +187,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_holxr"]
-size = Vector2(493.25, 537.625)
+size = Vector2(310.3125, 534.40625)
 
 [node name="CharacterBody2D" type="CharacterBody2D" groups=["player"]]
 collision_mask = 2
@@ -202,11 +203,11 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="punchhitbox"]
-position = Vector2(6, 48)
+position = Vector2(-12, 70)
 shape = SubResource("RectangleShape2D_4ni07")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(2, 7)
+position = Vector2(-1, 1)
 sprite_frames = SubResource("SpriteFrames_l71n6")
 animation = &"kick"
 frame = 8
@@ -222,12 +223,20 @@ offset_bottom = -158.0
 value = 100.0
 
 [node name="kickhitbox" type="Area2D" parent="."]
+position = Vector2(1, 0)
 collision_layer = 4
 collision_mask = 2
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="kickhitbox"]
-position = Vector2(-17, 105)
+position = Vector2(-8, 85)
 shape = SubResource("RectangleShape2D_holxr")
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(11, 93)
+position_smoothing_enabled = true
+position_smoothing_speed = 3.0
+script = ExtResource("38_t4otl")
+
 [connection signal="body_entered" from="punchhitbox" to="." method="_on_punchhitbox_body_entered"]
+[connection signal="body_entered" from="kickhitbox" to="." method="_on_kickhitbox_body_entered"]
