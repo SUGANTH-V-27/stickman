@@ -1,12 +1,96 @@
-[gd_scene load_steps=3 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=10 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://d0ao3ieetescq" path="res://scenes/enemy.tscn" id="2_0wfyh"]
+[ext_resource type="Texture2D" uid="uid://cuairb2ngfnyb" path="res://assets/backgrounds/red_forest/2.png" id="3_85g3d"]
+[ext_resource type="Texture2D" uid="uid://b78lmlc4gd745" path="res://assets/backgrounds/red_forest/6.png" id="4_choun"]
+[ext_resource type="Texture2D" uid="uid://dvq61feydu0nm" path="res://assets/backgrounds/red_forest/3.png" id="5_ya4ey"]
+[ext_resource type="Texture2D" uid="uid://b8g8fw0rqkwn1" path="res://assets/backgrounds/red_forest/5.png" id="6_eb6dy"]
+[ext_resource type="Texture2D" uid="uid://bm5qc5jcifkov" path="res://assets/backgrounds/red_forest/8.png" id="7_trceg"]
+[ext_resource type="Texture2D" uid="uid://naabfuqjqhix" path="res://assets/backgrounds/red_forest/7.png" id="8_a8y0u"]
+[ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="player" parent="." instance=ExtResource("1_o5qli")]
-position = Vector2(473, 257)
+position = Vector2(0, 359)
 
 [node name="enemy" parent="." instance=ExtResource("2_0wfyh")]
-position = Vector2(96, 261)
+position = Vector2(-209, 362)
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+follow_viewport_enabled = true
+scroll_limit_begin = Vector2(-4000, 0)
+scroll_limit_end = Vector2(4000, 0)
+
+[node name="L1_Sky_and_Sun" type="ParallaxLayer" parent="ParallaxBackground"]
+position = Vector2(1, 0)
+motion_scale = Vector2(0.02, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L1_Sky_and_Sun"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("3_85g3d")
+
+[node name="L2_Fog" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.05, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L2_Fog"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("4_choun")
+
+[node name="L3_Trees_Far" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.1, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L3_Trees_Far"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("5_ya4ey")
+
+[node name="L4_Trees_Pre_Mid" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.2, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L4_Trees_Pre_Mid"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("9_jkv2x")
+
+[node name="L5_Trees_Mid" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.35, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L5_Trees_Mid"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("6_eb6dy")
+
+[node name="L6_Trees_front" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.55, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L6_Trees_front"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("7_trceg")
+
+[node name="L7_Ground" type="ParallaxLayer" parent="ParallaxBackground"]
+position = Vector2(1, 0)
+motion_scale = Vector2(1, 0)
+motion_mirroring = Vector2(1980, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L7_Ground"]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(0, 540)
+texture = ExtResource("8_a8y0u")

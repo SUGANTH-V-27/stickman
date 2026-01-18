@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
-@export var ground_y := 270.0
+@export var ground_y := 800.0
 @export var speed := 120.0
 @export var max_health := 100
 @export var attack_damage := 10

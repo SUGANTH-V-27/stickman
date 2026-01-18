@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var max_health := 100
 @export var punch_damage := 20
 @export var kick_damage := 30
-@export var ground_y := 270.0
+@export var ground_y := 800.0
 
 # -------------------- STATE --------------------
 enum State { IDLE, MOVE, ATTACK, HIT, DEAD }
@@ -18,7 +18,7 @@ var health := 0
 @onready var punch_hitbox: Area2D = $punchhitbox
 @onready var kick_hitbox: Area2D = $kickhitbox
 @onready var health_bar: TextureProgressBar = $HealthBar
-@onready var camera := get_viewport().get_camera_2d()
+@onready var camera: Camera2D = $Camera2D
 
 # ------------------------------------------------
 
@@ -33,7 +33,7 @@ func _ready() -> void:
 	sprite.play("idle")
 
 # ------------------------------------------------
-
+const CAMERA_Y := 540
 func _physics_process(_delta: float) -> void:
 	if state in [State.DEAD, State.HIT, State.ATTACK]:
 		velocity = Vector2.ZERO
@@ -56,6 +56,7 @@ func _physics_process(_delta: float) -> void:
 
 		punch_hitbox.position.x = abs(punch_hitbox.position.x) * sign(dir)
 		kick_hitbox.position.x = abs(kick_hitbox.position.x) * sign(dir)
+	camera.global_position.y = CAMERA_Y
 
 # ------------------------------------------------
 
