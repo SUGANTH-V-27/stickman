@@ -148,7 +148,7 @@ size = Vector2(98, 34)
 size = Vector2(75, 37)
 
 [node name="CharacterBody2D" type="CharacterBody2D" groups=["enemy"]]
-collision_layer = 2
+collision_layer = 4
 script = ExtResource("1_md0e3")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -163,6 +163,7 @@ shape = SubResource("RectangleShape2D_md0e3")
 [node name="punchhitbox" type="Area2D" parent="."]
 position = Vector2(3, -5)
 collision_layer = 8
+collision_mask = 2
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="punchhitbox"]
@@ -171,6 +172,7 @@ shape = SubResource("RectangleShape2D_qaulx")
 
 [node name="attack_range" type="Area2D" parent="."]
 collision_layer = 16
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="attack_range"]
 position = Vector2(8.5, 11.5)

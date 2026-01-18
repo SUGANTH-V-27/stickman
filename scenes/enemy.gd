@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
-@export var ground_y := 800.0
 @export var speed := 120.0
 @export var max_health := 100
 @export var attack_damage := 10
 @export var attack_cooldown := 1.5
+@export var gravity := 2000.0
 
 # -------------------- STATE --------------------
 enum State { IDLE, MOVE, ATTACK, HIT, DEAD }
@@ -24,7 +24,6 @@ var can_attack := true
 
 func _ready() -> void:
 	health = max_health
-	global_position.y = ground_y
 
 	attack_range.monitoring = true
 	punch_hitbox.monitoring = false
@@ -37,15 +36,19 @@ func _ready() -> void:
 
 # ------------------------------------------------
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# ---- gravity ----
+	if not is_on_floor():
+		velocity.y += gravity * delta
+	else:
+		velocity.y = 0
+
 	if state in [State.DEAD, State.HIT]:
 		move_and_slide()
 		return
 
-	global_position.y = ground_y
-
 	if state == State.ATTACK:
-		velocity = Vector2.ZERO
+		velocity.x = 0
 		move_and_slide()
 		return
 

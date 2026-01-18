@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=11 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://d0ao3ieetescq" path="res://scenes/enemy.tscn" id="2_0wfyh"]
@@ -10,6 +10,9 @@
 [ext_resource type="Texture2D" uid="uid://naabfuqjqhix" path="res://assets/backgrounds/red_forest/7.png" id="8_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_85g3d"]
+size = Vector2(50000, 356)
+
 [node name="Node2D" type="Node2D"]
 
 [node name="player" parent="." instance=ExtResource("1_o5qli")]
@@ -19,9 +22,8 @@ position = Vector2(0, 359)
 position = Vector2(-209, 362)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
-follow_viewport_enabled = true
-scroll_limit_begin = Vector2(-4000, 0)
-scroll_limit_end = Vector2(4000, 0)
+scroll_limit_begin = Vector2(-4e+25, 0)
+scroll_limit_end = Vector2(4e+18, 0)
 
 [node name="L1_Sky_and_Sun" type="ParallaxLayer" parent="ParallaxBackground"]
 position = Vector2(1, 0)
@@ -94,3 +96,10 @@ texture_filter = 1
 texture_repeat = 2
 position = Vector2(0, 540)
 texture = ExtResource("8_a8y0u")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(914, 1183)
+shape = SubResource("RectangleShape2D_85g3d")
