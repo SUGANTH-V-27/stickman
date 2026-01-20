@@ -51,7 +51,7 @@ func _physics_process(delta: float) -> void:
 		velocity.x = 0
 		move_and_slide()
 		return
-
+	   
 	sprite.flip_h = player.global_position.x < global_position.x
 
 	if not attack_range.has_overlapping_bodies():
@@ -68,6 +68,7 @@ func _physics_process(delta: float) -> void:
 
 	if can_attack:
 		attack()
+
 
 # ------------------------------------------------
 # ATTACK
@@ -101,6 +102,16 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if body.is_in_group("player"):
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(attack_damage, dir, 200)
+		
+		# Show damage effects
+		var main = get_tree().current_scene
+		if main and main.has_method("get") and main.get("combat_system"):
+			main.combat_system.on_hit(
+				self,
+				body,
+				attack_damage,
+				body.global_position
+			)
 
 # ------------------------------------------------
 # DAMAGE

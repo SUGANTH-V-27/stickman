@@ -212,15 +212,6 @@ scale = Vector2(0.35, 0.35)
 sprite_frames = SubResource("SpriteFrames_l71n6")
 animation = &"idle"
 
-[node name="HealthBar" type="TextureProgressBar" parent="."]
-modulate = Color(0, 0.763664, 0.2906396, 1)
-self_modulate = Color(2.8878452e-07, 0.5806788, 0.25309566, 1)
-offset_left = -118.0
-offset_top = -192.0
-offset_right = 136.0
-offset_bottom = -158.0
-value = 100.0
-
 [node name="kickhitbox" type="Area2D" parent="."]
 position = Vector2(1, 0)
 scale = Vector2(0.7752138, 1.0209792)

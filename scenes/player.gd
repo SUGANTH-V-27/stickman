@@ -11,12 +11,14 @@ extends CharacterBody2D
 enum State { IDLE, MOVE, ATTACK, HIT, DEAD }
 var state: State = State.IDLE
 var health := 0
+signal health_changed(current: int, max: int)
+
 
 # -------------------- NODES --------------------
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var punch_hitbox: Area2D = $punchhitbox
 @onready var kick_hitbox: Area2D = $kickhitbox
-@onready var health_bar: TextureProgressBar = $HealthBar
+
 @onready var camera: Camera2D = $Camera2D
 
 const CAMERA_Y := 540.0
@@ -25,8 +27,9 @@ const CAMERA_Y := 540.0
 
 func _ready() -> void:
 	health = max_health
-	health_bar.max_value = max_health
-	health_bar.value = health
+	z_index = 10
+
+	
 
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
@@ -89,7 +92,7 @@ func punch() -> void:
 	await get_tree().create_timer(0.05).timeout
 	punch_hitbox.monitoring = false
 
-	await sprite.animation_finished
+	await get_tree().create_timer(0.25).timeout
 	state = State.IDLE
 	sprite.play("idle")
 
@@ -103,9 +106,10 @@ func kick() -> void:
 	await get_tree().create_timer(0.06).timeout
 	kick_hitbox.monitoring = false
 
-	await sprite.animation_finished
+	await get_tree().create_timer(0.35).timeout
 	state = State.IDLE
 	sprite.play("idle")
+
 
 # ------------------------------------------------
 # HITBOX SIGNALS
@@ -117,7 +121,17 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if body.is_in_group("enemy"):
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(punch_damage, dir, 200)
-		camera.shake(5)
+
+		var main = get_tree().current_scene
+		if main and main.has_method("get") and main.get("combat_system"):
+			main.combat_system.on_hit(
+				self,
+				body,
+				punch_damage,
+				body.global_position
+			)
+
+		
 
 func _on_kickhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
@@ -125,19 +139,30 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 	if body.is_in_group("enemy"):
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(kick_damage, dir, 450)
-		camera.shake(10)
+
+		var main = get_tree().current_scene
+		if main and main.has_method("get") and main.get("combat_system"):
+			main.combat_system.on_hit(
+				self,
+				body,
+				kick_damage,
+				body.global_position
+			)
+
+		
 
 # ------------------------------------------------
 # DAMAGE
 # ------------------------------------------------
-
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	if state == State.DEAD:
 		return
 
 	state = State.HIT
 	health -= amount
-	health_bar.value = health
+	health = max(health, 0)
+
+	emit_signal("health_changed", health, max_health)
 
 	velocity.x = knockback_dir * force
 	move_and_slide()
@@ -150,6 +175,7 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	await sprite.animation_finished
 	state = State.IDLE
 	sprite.play("idle")
+
 
 func die() -> void:
 	state = State.DEAD
