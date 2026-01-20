@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://d0ao3ieetescq"]
+[gd_scene load_steps=34 format=3 uid="uid://d0ao3ieetescq"]
 
 [ext_resource type="Script" uid="uid://d07acbsbe0o3x" path="res://scenes/enemy.gd" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://dyl4hjeld75lc" path="res://assets/animations/idle/idle0000.png" id="2_4ra3w"]
@@ -28,6 +28,7 @@
 [ext_resource type="Texture2D" uid="uid://de07shwccfvii" path="res://assets/animations/walk/walk0004.png" id="26_2tuss"]
 [ext_resource type="Texture2D" uid="uid://bhgvj02g4asyn" path="res://assets/animations/walk/walk0005.png" id="27_7v6cf"]
 [ext_resource type="Texture2D" uid="uid://c21cng5yrhelg" path="res://assets/animations/walk/walk0006.png" id="28_vab5u"]
+[ext_resource type="AudioStream" uid="uid://ccou7oawx3rnf" path="res://assets/sounds/hit.wav" id="29_1f82d"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5uy6h"]
 animations = [{
@@ -177,5 +178,10 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="attack_range"]
 position = Vector2(8.5, 11.5)
 shape = SubResource("RectangleShape2D_1f82d")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="hit_sfx" type="AudioStreamPlayer" parent="AudioStreamPlayer"]
+stream = ExtResource("29_1f82d")
 
 [connection signal="body_entered" from="punchhitbox" to="." method="_on_punchhitbox_body_entered"]

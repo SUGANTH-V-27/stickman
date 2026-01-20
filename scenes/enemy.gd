@@ -19,7 +19,7 @@ var can_attack := true
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_range: Area2D = $attack_range
 @onready var punch_hitbox: Area2D = $punchhitbox
-
+@onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
 # ------------------------------------------------
 
 func _ready() -> void:
@@ -99,6 +99,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("player"):
+		hit_sfx.play()  
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(attack_damage, dir, 200)
 

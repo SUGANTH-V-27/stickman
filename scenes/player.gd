@@ -18,6 +18,8 @@ var health := 0
 @onready var kick_hitbox: Area2D = $kickhitbox
 @onready var health_bar: TextureProgressBar = $HealthBar
 @onready var camera: Camera2D = $Camera2D
+@onready var air_sfx: AudioStreamPlayer = $AudioStreamPlayer/air_sfx
+@onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
 
 const CAMERA_Y := 540.0
 
@@ -82,6 +84,7 @@ func _input(event) -> void:
 func punch() -> void:
 	state = State.ATTACK
 	sprite.play("punch")
+	air_sfx.play()
 
 	await get_tree().create_timer(0.08).timeout
 	punch_hitbox.monitoring = true
@@ -96,7 +99,8 @@ func punch() -> void:
 func kick() -> void:
 	state = State.ATTACK
 	sprite.play("kick")
-
+	air_sfx.play() 
+	
 	await get_tree().create_timer(0.22).timeout
 	kick_hitbox.monitoring = true
 
@@ -115,6 +119,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("enemy"):
+		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(punch_damage, dir, 200)
 		camera.shake(5)
@@ -123,6 +128,7 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("enemy"):
+		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(kick_damage, dir, 450)
 		camera.shake(10)
@@ -156,3 +162,23 @@ func die() -> void:
 	sprite.play("death")
 	await sprite.animation_finished
 	queue_free()
+	
+func _on_AttackButton_pressed() -> void:
+	if state not in [State.DEAD, State.HIT, State.ATTACK]:
+		punch()
+
+func _on_KickButton_pressed() -> void:
+	if state not in [State.DEAD, State.HIT, State.ATTACK]:
+		kick()
+		
+
+
+ # Replace with function body.
+
+
+func _on_kick_button_pressed() -> void:
+	pass # Replace with function body.
+
+
+func _on_attack_button_pressed() -> void:
+	pass # Replace with function body.
