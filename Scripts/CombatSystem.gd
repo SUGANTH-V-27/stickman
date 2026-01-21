@@ -53,7 +53,7 @@ func shake_camera(duration: float, intensity: float):
 	var original_offset = camera.offset
 	var elapsed = 0.0
 	
-	while elapsed < duration: 
+	while elapsed < duration:
 		camera.offset = original_offset + Vector2(
 			randf_range(-intensity, intensity),
 			randf_range(-intensity, intensity)
