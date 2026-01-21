@@ -1,3 +1,5 @@
+
+
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
@@ -166,6 +168,17 @@ func die() -> void:
 	sprite.play("death")
 	await sprite.animation_finished
 	queue_free()
+
+
+# ------------------------------------------------
+# PAUSE SUPPORT
+# ------------------------------------------------
+
+func _set_paused_state(paused: bool) -> void:
+	set_process(!paused)
+	set_physics_process(!paused)
+	set_process_input(!paused)
+
 	
 func _on_AttackButton_pressed() -> void:
 	if state not in [State.DEAD, State.HIT, State.ATTACK]:
@@ -174,15 +187,3 @@ func _on_AttackButton_pressed() -> void:
 func _on_KickButton_pressed() -> void:
 	if state not in [State.DEAD, State.HIT, State.ATTACK]:
 		kick()
-		
-
-
- # Replace with function body.
-
-
-func _on_kick_button_pressed() -> void:
-	pass # Replace with function body.
-
-
-func _on_attack_button_pressed() -> void:
-	pass # Replace with function body.

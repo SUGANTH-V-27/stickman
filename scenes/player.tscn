@@ -192,7 +192,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_holxr"]
 size = Vector2(108.357216, 159.65067)
 
-[node name="CharacterBody2D" type="CharacterBody2D" groups=["player"]]
+[node name="CharacterBody2D" type="CharacterBody2D" groups=["pausable", "player"]]
 collision_layer = 2
 script = ExtResource("1_ur7pv")
 

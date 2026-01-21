@@ -1,3 +1,5 @@
+
+
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
@@ -137,3 +139,24 @@ func die() -> void:
 	sprite.play("death")
 	await sprite.animation_finished
 	queue_free()
+
+# ------------------------------------------------
+# PAUSE SUPPORT
+# ------------------------------------------------
+
+func _set_paused_state(paused: bool) -> void:
+	# Stop logic
+	set_process(!paused)
+	set_physics_process(!paused)
+	set_process_input(!paused)
+
+	# Stop or resume animation
+	if paused:
+		sprite.pause()
+	else:
+		sprite.play(sprite.animation)
+
+	# Pause timers if any exist
+	for child in get_children():
+		if child is Timer:
+			child.paused = paused
