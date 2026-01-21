@@ -20,6 +20,7 @@ var health := 0
 @onready var camera: Camera2D = $Camera2D
 @onready var air_sfx: AudioStreamPlayer = $AudioStreamPlayer/air_sfx
 @onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
+@onready var walk_sfx: AudioStreamPlayer = $AudioStreamPlayer/walk_sfx
 
 const CAMERA_Y := 540.0
 
@@ -65,6 +66,9 @@ func _physics_process(delta: float) -> void:
 
 		punch_hitbox.position.x = abs(punch_hitbox.position.x) * sign(dir)
 		kick_hitbox.position.x = abs(kick_hitbox.position.x) * sign(dir)
+		if not walk_sfx.playing:
+			walk_sfx.play()
+
 
 # ------------------------------------------------
 
