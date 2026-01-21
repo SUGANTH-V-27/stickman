@@ -2,9 +2,11 @@ extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
 @export var speed := 300.0
+@export var jump_force := 600.0
 @export var max_health := 100
 @export var punch_damage := 20
 @export var kick_damage := 30
+@export var aerial_punch_damage := 35  # Jump + Punch combo
 @export var gravity := 2000.0
 
 # -------------------- STATE --------------------
@@ -45,8 +47,18 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.y = 0
 
+	# ---- Jump ----
+	if Input.is_action_just_pressed("ui_up") and is_on_floor():
+		velocity.y = -jump_force
+
 	# ---- locked states ----
-	if state in [State.DEAD, State.HIT, State.ATTACK]:
+	if state in [State.DEAD, State.HIT]:
+		velocity.x = 0
+		move_and_slide()
+		return
+	
+	# Allow air control during attack
+	if state == State.ATTACK and is_on_floor():
 		velocity.x = 0
 		move_and_slide()
 		return
@@ -56,21 +68,28 @@ func _physics_process(delta: float) -> void:
 	velocity.x = dir * speed
 	move_and_slide()
 
-	if dir == 0:
-		state = State.IDLE
-		sprite.play("idle")
-	else:
-		state = State.MOVE
-		sprite.flip_h = dir < 0
-		sprite.play("walk")
-
+	if dir == 0 and is_on_floor():
+		if state != State.ATTACK:
+			state = State.IDLE
+			sprite.play("idle")
+	elif dir != 0 and is_on_floor():
+		if state != State.ATTACK:
+			state = State.MOVE
+			sprite.flip_h = dir < 0
+			sprite.play("walk")
+		
+	# Update hitbox direction when moving
+	if dir != 0:
 		punch_hitbox.position.x = abs(punch_hitbox.position.x) * sign(dir)
 		kick_hitbox.position.x = abs(kick_hitbox.position.x) * sign(dir)
 
 # ------------------------------------------------
 
 func _input(event) -> void:
-	if state in [State.DEAD, State.HIT, State.ATTACK]:
+	if state in [State.DEAD, State.HIT]:
+		return
+	
+	if state == State.ATTACK:
 		return
 
 	if event.is_action_pressed("attack"):
@@ -120,14 +139,19 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 		return
 	if body.is_in_group("enemy"):
 		var dir := -1 if sprite.flip_h else 1
-		body.take_damage(punch_damage, dir, 200)
+		
+		# Aerial punch combo - more damage!
+		var damage = aerial_punch_damage if not is_on_floor() else punch_damage
+		var knockback = 350 if not is_on_floor() else 200
+		
+		body.take_damage(damage, dir, knockback)
 
 		var main = get_tree().current_scene
 		if main and main.has_method("get") and main.get("combat_system"):
 			main.combat_system.on_hit(
 				self,
 				body,
-				punch_damage,
+				damage,
 				body.global_position
 			)
 
