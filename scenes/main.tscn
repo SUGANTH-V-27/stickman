@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://bm5qc5jcifkov" path="res://assets/backgrounds/red_forest/8.png" id="7_trceg"]
 [ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
 [ext_resource type="Texture2D" uid="uid://ol5sgcloprn" path="res://assets/backgrounds/red_forest/7-edited final.png" id="10_choun"]
+[ext_resource type="PackedScene" uid="uid://b5j4i6mckrlw1" path="res://scenes/HUD.tscn" id="10_ya4ey"]
 
 [sub_resource type="GDScript" id="GDScript_85g3d"]
 script/source = "extends Node2D
@@ -41,6 +42,14 @@ func _process(delta: float) -> void:
 			bg.get_node(\"L6_Trees_front\").motion_mirroring.x = 1920
 		if cam_x >= 3500:
 			bg.get_node(\"L7_Ground\").motion_mirroring.x = 1920
+
+
+func _on_attack_button_pressed() -> void:
+	pass # Replace with function body.
+
+
+func _on_kick_button_pressed() -> void:
+	pass # Replace with function body.
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_85g3d"]
@@ -119,26 +128,26 @@ texture_repeat = 2
 position = Vector2(920, 540)
 texture = ExtResource("6_eb6dy")
 
-[node name="L6_Trees_front" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(0.55, 0)
+[node name="L6_Ground" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(1, 0)
 motion_mirroring = Vector2(1980, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L6_Trees_front"]
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L6_Ground"]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(900, 540)
-texture = ExtResource("7_trceg")
+texture = ExtResource("10_choun")
 
-[node name="L7_Ground" type="ParallaxLayer" parent="ParallaxBackground"]
+[node name="L7_Tree_Front" type="ParallaxLayer" parent="ParallaxBackground"]
 position = Vector2(0.5, 0)
 motion_scale = Vector2(1, 0)
 motion_mirroring = Vector2(1980, 0)
 
-[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L7_Ground"]
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/L7_Tree_Front"]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(1000, 540)
-texture = ExtResource("10_choun")
+texture = ExtResource("7_trceg")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 collision_mask = 0
@@ -155,3 +164,32 @@ offset_right = 60.0
 offset_bottom = 40.0
 value = 100.0
 texture_progress = SubResource("GradientTexture2D_choun")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="AttackButton" type="TextureButton" parent="UI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="KickButton" type="TextureButton" parent="UI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Hud" parent="." instance=ExtResource("10_ya4ey")]
+
+[connection signal="pressed" from="UI/AttackButton" to="player" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="UI/KickButton" to="player" method="_on_kick_button_pressed"]

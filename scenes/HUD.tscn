@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5j4i6mckrlw1"]
+
+[ext_resource type="Script" uid="uid://obpf2rvg8rgt" path="res://scenes/HUD.gd" id="1_qpvh6"]
+
+[node name="Hud" type="CanvasLayer"]
+process_mode = 1
+script = ExtResource("1_qpvh6")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/MarginContainer"]
+layout_mode = 2
+
+[node name="PauseButton" type="Button" parent="Control/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="RestartButton" type="Button" parent="Control/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="Control/MarginContainer/HBoxContainer"]
+layout_mode = 2

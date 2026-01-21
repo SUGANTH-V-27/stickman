@@ -1,3 +1,5 @@
+
+
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
@@ -22,6 +24,9 @@ signal health_changed(current: int, max: int)
 @onready var kick_hitbox: Area2D = $kickhitbox
 
 @onready var camera: Camera2D = $Camera2D
+@onready var air_sfx: AudioStreamPlayer = $AudioStreamPlayer/air_sfx
+@onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
+@onready var walk_sfx: AudioStreamPlayer = $AudioStreamPlayer/walk_sfx
 
 const CAMERA_Y := 540.0
 
@@ -82,6 +87,9 @@ func _physics_process(delta: float) -> void:
 	if dir != 0:
 		punch_hitbox.position.x = abs(punch_hitbox.position.x) * sign(dir)
 		kick_hitbox.position.x = abs(kick_hitbox.position.x) * sign(dir)
+		if not walk_sfx.playing:
+			walk_sfx.play()
+
 
 # ------------------------------------------------
 
@@ -104,6 +112,7 @@ func _input(event) -> void:
 func punch() -> void:
 	state = State.ATTACK
 	sprite.play("punch")
+	air_sfx.play()
 
 	await get_tree().create_timer(0.08).timeout
 	punch_hitbox.monitoring = true
@@ -118,7 +127,8 @@ func punch() -> void:
 func kick() -> void:
 	state = State.ATTACK
 	sprite.play("kick")
-
+	air_sfx.play() 
+	
 	await get_tree().create_timer(0.22).timeout
 	kick_hitbox.monitoring = true
 
@@ -138,6 +148,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("enemy"):
+		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
 		
 		# Aerial punch combo - more damage!
@@ -161,6 +172,7 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("enemy"):
+		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(kick_damage, dir, 450)
 
@@ -206,3 +218,22 @@ func die() -> void:
 	sprite.play("death")
 	await sprite.animation_finished
 	queue_free()
+
+
+# ------------------------------------------------
+# PAUSE SUPPORT
+# ------------------------------------------------
+
+func _set_paused_state(paused: bool) -> void:
+	set_process(!paused)
+	set_physics_process(!paused)
+	set_process_input(!paused)
+
+	
+func _on_AttackButton_pressed() -> void:
+	if state not in [State.DEAD, State.HIT, State.ATTACK]:
+		punch()
+
+func _on_KickButton_pressed() -> void:
+	if state not in [State.DEAD, State.HIT, State.ATTACK]:
+		kick()

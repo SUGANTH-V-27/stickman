@@ -1,3 +1,5 @@
+
+
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
@@ -19,7 +21,7 @@ var can_attack := true
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_range: Area2D = $attack_range
 @onready var punch_hitbox: Area2D = $punchhitbox
-
+@onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
 # ------------------------------------------------
 
 func _ready() -> void:
@@ -100,6 +102,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("player"):
+		hit_sfx.play()  
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(attack_damage, dir, 200)
 		
@@ -149,3 +152,24 @@ func die() -> void:
 	sprite.play("death")
 	await sprite.animation_finished
 	queue_free()
+
+# ------------------------------------------------
+# PAUSE SUPPORT
+# ------------------------------------------------
+
+func _set_paused_state(paused: bool) -> void:
+	# Stop logic
+	set_process(!paused)
+	set_physics_process(!paused)
+	set_process_input(!paused)
+
+	# Stop or resume animation
+	if paused:
+		sprite.pause()
+	else:
+		sprite.play(sprite.animation)
+
+	# Pause timers if any exist
+	for child in get_children():
+		if child is Timer:
+			child.paused = paused
