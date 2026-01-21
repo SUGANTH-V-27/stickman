@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=16 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="Script" uid="uid://gyicvvqocdmw" path="res://scenes/main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
@@ -160,12 +160,16 @@ shape = SubResource("RectangleShape2D_85g3d")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HealthBar" type="TextureProgressBar" parent="UI"]
-offset_right = 60.0
-offset_bottom = 40.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 60.0
+grow_horizontal = 0
 value = 100.0
 texture_progress = SubResource("GradientTexture2D_choun")
-
-[node name="UI" type="CanvasLayer" parent="."]
 
 [node name="AttackButton" type="TextureButton" parent="UI"]
 anchors_preset = 3
@@ -188,6 +192,8 @@ offset_left = -8.0
 offset_top = -8.0
 grow_horizontal = 0
 grow_vertical = 0
+
+[node name="UI2" type="CanvasLayer" parent="."]
 
 [node name="Hud" parent="." instance=ExtResource("10_ya4ey")]
 

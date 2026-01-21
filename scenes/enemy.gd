@@ -142,6 +142,9 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 
 	state = State.IDLE
 	sprite.play("idle")
+	await get_tree().create_timer(attack_cooldown).timeout
+	can_attack = true
+	
 
 # ------------------------------------------------
 
