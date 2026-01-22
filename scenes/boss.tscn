@@ -1,0 +1,205 @@
+[gd_scene load_steps=44 format=3 uid="uid://c4f2g8iaj3k1m"]
+
+[ext_resource type="Script" path="res://scenes/boss.gd" id="1_boss"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss idle/frame_idle.png" id="2_boss_idle"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00001.png" id="3_punch1"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00002.png" id="4_punch2"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00003.png" id="5_punch3"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00004.png" id="6_punch4"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00005.png" id="7_punch5"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00006.png" id="8_punch6"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00007.png" id="9_punch7"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00008.png" id="10_punch8"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00009.png" id="11_punch9"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00010.png" id="12_punch10"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss punch/frame_00011.png" id="13_punch11"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00001.png" id="14_walk1"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00002.png" id="15_walk2"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00003.png" id="16_walk3"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00004.png" id="17_walk4"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00005.png" id="18_walk5"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00006.png" id="19_walk6"]
+[ext_resource type="Texture2D" path="res://assets/animations/boss walk/frame_00007.png" id="20_walk7"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0000.png" id="21_death0"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0001.png" id="22_death1"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0002.png" id="23_death2"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0003.png" id="24_death3"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0004.png" id="25_death4"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0005.png" id="26_death5"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0006.png" id="27_death6"]
+[ext_resource type="Texture2D" path="res://assets/animations/death/death0007.png" id="28_death7"]
+[ext_resource type="Texture2D" path="res://assets/animations/hit/hit0000.png" id="29_hit0"]
+[ext_resource type="Texture2D" path="res://assets/animations/hit/hit0001.png" id="30_hit1"]
+[ext_resource type="Texture2D" path="res://assets/animations/hit/hit0002.png" id="31_hit2"]
+[ext_resource type="Texture2D" path="res://assets/animations/hit/hit0003.png" id="32_hit3"]
+[ext_resource type="AudioStream" uid="uid://ccou7oawx3rnf" path="res://assets/sounds/hit.wav" id="33_hitsound"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_boss_idle")
+}],
+"loop": true,
+"name": &"boss_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_punch1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_punch2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_punch3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_punch4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_punch5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_punch6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_punch7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_punch8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_punch9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_punch10")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_punch11")
+}],
+"loop": false,
+"name": &"boss_punch",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_walk1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_walk2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_walk3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_walk4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_walk5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_walk6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_walk7")
+}],
+"loop": true,
+"name": &"boss_walk",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("21_death0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_death1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_death2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_death3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_death4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_death5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_death6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_death7")
+}],
+"loop": false,
+"name": &"death",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("29_hit0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_hit1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_hit2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_hit3")
+}],
+"loop": false,
+"name": &"hit",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
+size = Vector2(47, 153)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
+size = Vector2(90, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(100, 80)
+
+[node name="Boss" type="CharacterBody2D" groups=["boss", "enemy", "pausable"]]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_boss")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
+sprite_frames = SubResource("SpriteFrames_boss")
+animation = &"boss_idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 29.5)
+shape = SubResource("RectangleShape2D_boss")
+
+[node name="attack_range" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="attack_range"]
+position = Vector2(8.5, 11.5)
+shape = SubResource("RectangleShape2D_attack")
+
+[node name="punchhitbox" type="Area2D" parent="."]
+position = Vector2(3, -5)
+collision_layer = 8
+collision_mask = 2
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="punchhitbox"]
+position = Vector2(7, 16)
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="AudioStreamPlayer" type="Node" parent="."]
+
+[node name="hit_sfx" type="AudioStreamPlayer" parent="AudioStreamPlayer"]
+stream = ExtResource("33_hitsound")
+volume_db = -10.0
+
+[connection signal="body_entered" from="punchhitbox" to="." method="_on_punchhitbox_body_entered"]

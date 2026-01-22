@@ -209,24 +209,35 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 
 	emit_signal("health_changed", health, max_health)
 
-	velocity.x = knockback_dir * force
-	move_and_slide()
-
+	# Check for death BEFORE applying knockback and animation
 	if health <= 0:
 		die()
 		return
 
+	velocity.x = knockback_dir * force
+	move_and_slide()
+
 	sprite.play("hit")
 	await sprite.animation_finished
+	
+	# Double check we're still alive after animation
+	if state == State.DEAD:
+		return
+		
 	state = State.IDLE
 	sprite.play("idle")
 
 
 func die() -> void:
 	state = State.DEAD
+	velocity.x = 0
+	punch_hitbox.monitoring = false
+	kick_hitbox.monitoring = false
 	sprite.play("death")
+	print("💀 PLAYER DIED!")
 	await sprite.animation_finished
-	queue_free()
+	if is_instance_valid(self):
+		queue_free()
 
 
 # ------------------------------------------------
