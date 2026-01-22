@@ -10,16 +10,11 @@ var spawn_system
 @onready var enemy = $enemy    # Remove this - enemies will be spawned!
 @onready var parallax_bg = $ParallaxBackground
 
-@onready var health_bar: TextureProgressBar = $UI/HealthBar
-
 func _ready():
 	print("🎮 Main scene loaded!")
 
-	# Health bar
+	# Initialize player health
 	player.health = player.max_health
-	health_bar.max_value = player.max_health
-	health_bar.value = player.health
-	player.health_changed.connect(_on_player_health_changed)
 
 	# Remove static enemy
 	if enemy:
@@ -31,14 +26,8 @@ func _ready():
 
 	await get_tree().create_timer(1.0).timeout
 	spawn_system.start_wave_mode()
-
-func _on_player_health_changed(current: int, max: int) -> void:
-	health_bar.max_value = max
-	health_bar.value = current
 	
 func _process(delta):
-	health_bar.value = player.health
-	
 	# Handle parallax background scrolling
 	if parallax_bg:
 		var cam = player.get_node_or_null("Camera2D")

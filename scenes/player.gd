@@ -22,6 +22,7 @@ signal health_changed(current: int, max: int)
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var punch_hitbox: Area2D = $punchhitbox
 @onready var kick_hitbox: Area2D = $kickhitbox
+@onready var health_bar: ProgressBar = $HealthBar
 
 @onready var camera: Camera2D = $Camera2D
 @onready var air_sfx: AudioStreamPlayer = $AudioStreamPlayer/air_sfx
@@ -36,6 +37,10 @@ func _ready() -> void:
 	health = max_health
 	z_index = 10
 
+	# Setup health bar
+	if health_bar:
+		health_bar.max_value = max_health
+		health_bar.value = health
 	
 
 	punch_hitbox.monitoring = false
@@ -197,6 +202,10 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	state = State.HIT
 	health -= amount
 	health = max(health, 0)
+
+	# Update health bar AFTER reducing health
+	if health_bar:
+		health_bar.value = health
 
 	emit_signal("health_changed", health, max_health)
 

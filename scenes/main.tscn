@@ -159,18 +159,6 @@ shape = SubResource("RectangleShape2D_85g3d")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="HealthBar" type="TextureProgressBar" parent="UI"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -220.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = 60.0
-grow_horizontal = 0
-value = 100.0
-texture_progress = SubResource("GradientTexture2D_choun")
-
 [node name="AttackButton" type="TextureButton" parent="UI"]
 anchors_preset = 3
 anchor_left = 1.0
