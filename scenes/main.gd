@@ -4,6 +4,7 @@ extends Node2D
 # Systems
 var combat_system
 var spawn_system
+var circular_menu
 
 # Node references
 @onready var player = $player  # Your player node
@@ -23,6 +24,7 @@ func _ready():
 	# Initialize systems ONCE
 	setup_combat_system()
 	setup_spawn_system()
+	setup_circular_menu()
 
 	await get_tree().create_timer(1.0).timeout
 	spawn_system.start_wave_mode()
@@ -60,10 +62,11 @@ func setup_spawn_system():
 	# ✅ FIX: Set scene_root manually
 	
 	# Set spawn positions (adjust these to your arena size)
+	# Enemies spawn off-screen on left and right sides, then walk in
+	# Y=1005 is ground level (just above the collision floor)
 	spawn_system.set_spawn_positions([
-		Vector2(5100, 359),   # Left spawn (200 units left of player)
-		Vector2(5500, 359),   # Right spawn (200 units right of player)
-		Vector2(5300, 359)    # Center spawn (at player position)
+		Vector2(4500, 1005),   # Far left off-screen, on ground
+		Vector2(6100, 1005),   # Far right off-screen, on ground
 	])
 	
 	# Connect signals for UI/events
@@ -95,3 +98,16 @@ func _on_game_won():
 	print("📢 UI: VICTORY!")
 	# TODO: Show victory screen
 	# Example: $VictoryScreen.visible = true
+
+# Setup circular menu
+func setup_circular_menu():
+	# Load NEW circular menu scene (advanced rotating wheel)
+	var CircularMenuScene = preload("res://scenes/CircularMenu.tscn")
+	circular_menu = CircularMenuScene.instantiate()
+	add_child(circular_menu)
+	print("✅ New Circular Menu initialized")
+
+# Handle pause/resume (called from menu)
+func _input(event):
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		get_tree().paused = not get_tree().paused

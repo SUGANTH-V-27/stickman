@@ -8,6 +8,7 @@ signal game_won
 
 # Enemy scene
 var enemy_scene = preload("res://scenes/enemy.tscn")
+var health_pickup_scene = preload("res://scenes/health_pickup.tscn")
 # var boss_scene = preload("res://scenes/boss.tscn")  # Uncomment when you have boss
 
 # Wave configuration
@@ -110,6 +111,9 @@ func on_wave_complete():
 	emit_signal("wave_completed", current_wave)
  
 	print("✅ Wave ", current_wave, " complete!")
+	
+	# Spawn health pickup as reward
+	spawn_health_pickup()
 
 	# Delay before next wave
 	scene_root.get_tree().create_timer(WAVE_DELAY).timeout.connect(start_next_wave)
@@ -144,6 +148,20 @@ func get_wave_info() -> Dictionary:
 		"total_killed": total_enemies_killed,
 		"is_boss_wave": current_wave > MAX_WAVES
 	}
+
+# Spawn health pickup after wave
+func spawn_health_pickup():
+	var health_pickup = health_pickup_scene.instantiate()
+	
+	# Spawn at center of arena, on ground
+	var player = scene_root.get_node_or_null("player")
+	if player:
+		health_pickup.global_position = Vector2(player.global_position.x, 1005)
+	else:
+		health_pickup.global_position = Vector2(5300, 1005)
+	
+	scene_root.add_child(health_pickup)
+	print("💊 Health pickup spawned!")
 
 # Reset system
 func reset():
