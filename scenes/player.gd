@@ -1,5 +1,4 @@
 
-
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
