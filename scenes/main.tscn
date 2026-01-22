@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=14 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="Script" uid="uid://gyicvvqocdmw" path="res://scenes/main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
@@ -54,14 +54,6 @@ func _on_kick_button_pressed() -> void:
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_85g3d"]
 size = Vector2(50000, 356)
-
-[sub_resource type="Gradient" id="Gradient_85g3d"]
-colors = PackedColorArray(0, 1, 0, 1, 0, 0.8, 0, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_choun"]
-gradient = SubResource("Gradient_85g3d")
-width = 60
-height = 10
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_main")

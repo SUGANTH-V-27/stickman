@@ -1,4 +1,3 @@
-# SpawnSystem.gd - Handles enemy waves and boss spawning
 extends Node
 
 signal wave_started(wave_number, enemy_count)
@@ -8,7 +7,7 @@ signal game_won
 
 # Enemy scene
 var enemy_scene = preload("res://scenes/enemy.tscn")
-# var boss_scene = preload("res://scenes/boss.tscn")  # Uncomment when you have boss
+# var boss_scene = preload("res://scenes/boss.tscn")
 
 # Wave configuration
 const MAX_WAVES = 10
@@ -17,18 +16,26 @@ const WAVE_DELAY = 3.0
 const ENEMY_SPAWN_INTERVAL = 1.0
 
 # Wave state
-var current_wave = 0
-var enemies_alive = 0
-var total_enemies_killed = 0
-var wave_active = false
-var boss_spawned_flag = false
+var current_wave: int = 0
+var enemies_alive: int = 0
+var total_enemies_killed: int = 0
+var wave_active: bool = false
+var boss_spawned_flag: bool = false
+var paused: bool = false   # <-- pause flag
 
 # References
 var scene_root: Node = null
-var spawn_positions = []
+var spawn_positions: Array = []
+
+func _ready():
+	add_to_group("pausable")   # HUD can now pause/resume this system
 
 func _init(scene):
 	scene_root = scene
+
+# Called by HUD pause menu
+func _set_paused_state(state: bool) -> void:
+	paused = state
 
 # Set spawn positions (call this from main scene)
 func set_spawn_positions(positions: Array):
@@ -46,7 +53,7 @@ func start_wave_mode():
 func start_next_wave():
 	current_wave += 1
 	
-	# Check if boss wave
+	# Boss wave check
 	if current_wave > MAX_WAVES and not boss_spawned_flag:
 		spawn_boss()
 		return
@@ -57,27 +64,39 @@ func start_next_wave():
 	emit_signal("wave_started", current_wave, enemy_count)
 	print("🌊 Wave ", current_wave, " starting with ", enemy_count, " enemies")
 	
-	# Spawn enemies with delay
+	# Run spawn loop
+	_spawn_loop(enemy_count)
+
+# Pause-aware spawn loop
+func _spawn_loop(enemy_count: int) -> void:
 	for i in range(enemy_count):
-		await scene_root.get_tree().create_timer(ENEMY_SPAWN_INTERVAL).timeout
+		# Freeze while paused
+		while paused:
+			await get_tree().process_frame
+		
+		# Timer that halts when paused
+		var timer = scene_root.get_tree().create_timer(ENEMY_SPAWN_INTERVAL, false)
+		await timer.timeout
+		
+		# Double-check pause before spawning
+		while paused:
+			await get_tree().process_frame
+		
 		spawn_enemy()
 
-# Calculate enemies for wave (scales with difficulty)
+# Calculate enemies for wave
 func get_enemies_for_wave(wave: int) -> int:
 	return BASE_ENEMIES_PER_WAVE + int(wave / 2)
 
 # Spawn single enemy
 func spawn_enemy():
 	var enemy = enemy_scene.instantiate()
-	
-	# Get random spawn position
 	var spawn_pos = get_random_spawn_position()
 	enemy.global_position = spawn_pos
 	
 	scene_root.add_child(enemy)
 	enemies_alive += 1
 	
-	# Connect death signal
 	if not enemy.is_connected("tree_exited", _on_enemy_died):
 		enemy.tree_exited.connect(_on_enemy_died)
 	
@@ -89,7 +108,6 @@ func get_random_spawn_position() -> Vector2:
 	if spawn_positions.size() > 0:
 		return spawn_positions[randi() % spawn_positions.size()]
 	else:
-		# Default spawn positions
 		var x = randf_range(100, 700)
 		return Vector2(x, 270)
 
@@ -100,7 +118,6 @@ func _on_enemy_died():
 	
 	print("💀 Enemy killed! Alive: ", enemies_alive, " | Total killed: ", total_enemies_killed)
 	
-	# Check if wave complete
 	if enemies_alive == 0 and wave_active:
 		on_wave_complete()
 
@@ -108,26 +125,28 @@ func _on_enemy_died():
 func on_wave_complete():
 	wave_active = false
 	emit_signal("wave_completed", current_wave)
- 
 	print("✅ Wave ", current_wave, " complete!")
+	_delayed_next_wave()
 
-	# Delay before next wave
-	scene_root.get_tree().create_timer(WAVE_DELAY).timeout.connect(start_next_wave)
-
+# Pause-aware delay before next wave
+func _delayed_next_wave() -> void:
+	while paused:
+		await get_tree().process_frame
+	
+	var timer = scene_root.get_tree().create_timer(WAVE_DELAY, false)
+	await timer.timeout
+	
+	while paused:
+		await get_tree().process_frame
+	
+	start_next_wave()
 
 # Spawn boss
 func spawn_boss():
 	boss_spawned_flag = true
 	emit_signal("boss_spawned")
-	
 	print("🔥 BOSS WAVE!")
-	
-	# TODO: Spawn boss when you create boss scene
-	# var boss = boss_scene.instantiate()
-	# boss.global_position = Vector2(600, 270)
-	# scene_root.add_child(boss)
-	# enemies_alive += 1
-	# boss.tree_exited.connect(_on_boss_died)
+	# TODO: spawn boss scene
 
 # Called when boss dies
 func _on_boss_died():
