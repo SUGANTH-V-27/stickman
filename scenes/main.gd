@@ -5,6 +5,7 @@ extends Node2D
 var combat_system
 var spawn_system
 var circular_menu
+var instructions_menu
 var wave_selection_menu
 
 # Node references
@@ -27,8 +28,8 @@ func _ready():
 	setup_spawn_system()
 	setup_circular_menu()
 
-	# Show wave selection menu
-	show_wave_selection()
+	# Show instructions first
+	show_instructions()
 	
 func _process(delta):
 	# Handle parallax background scrolling
@@ -77,6 +78,19 @@ func setup_spawn_system():
 	spawn_system.game_won.connect(_on_game_won)
 	
 	print("✅ Spawn System initialized")
+
+# Show instructions menu
+func show_instructions():
+	var InstructionsMenuScene = preload("res://scenes/InstructionsMenu.tscn")
+	instructions_menu = InstructionsMenuScene.instantiate()
+	instructions_menu.continue_pressed.connect(_on_instructions_continue)
+	add_child(instructions_menu)
+	print("📖 Instructions Menu shown")
+
+# Called when player clicks continue on instructions
+func _on_instructions_continue():
+	print("📖 Instructions acknowledged")
+	show_wave_selection()
 
 # Show wave selection menu
 func show_wave_selection():

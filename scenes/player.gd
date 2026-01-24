@@ -15,6 +15,7 @@ extends CharacterBody2D
 enum State { IDLE, MOVE, ATTACK, HIT, DEAD }
 var state: State = State.IDLE
 var health := 0
+var is_dying := false  # Prevents multiple death calls
 signal health_changed(current: int, max: int)
 
 
@@ -196,7 +197,8 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 # DAMAGE
 # ------------------------------------------------
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
-	if state == State.DEAD:
+	# Prevent taking damage if already dead, dying, or currently being hit
+	if state == State.DEAD or is_dying or state == State.HIT:
 		return
 
 	state = State.HIT
@@ -211,6 +213,7 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 
 	# Check for death BEFORE applying knockback and animation
 	if health <= 0:
+		is_dying = true  # Set flag immediately to block further damage
 		die()
 		return
 
@@ -229,12 +232,17 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 
 
 func die() -> void:
+	# Prevent multiple death calls
+	if state == State.DEAD:
+		return
+	
 	state = State.DEAD
+	is_dying = true
 	velocity.x = 0
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
 	sprite.play("death")
-	print("💀 PLAYER DIED!")
+	print("💀 PLAYER DIED! Final Health: ", health)
 	await sprite.animation_finished
 	if is_instance_valid(self):
 		queue_free()
