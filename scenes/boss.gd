@@ -4,7 +4,7 @@ extends CharacterBody2D
 @export var speed := 80.0  # Slower than normal enemies
 @export var max_health := 300  # Much more health
 @export var attack_damage := 40  # More damage
-@export var attack_cooldown := 2.0  # Slower attacks
+@export var attack_cooldown := 1.2  # Faster attacks for challenge
 @export var gravity := 2000.0
 
 # -------------------- STATE --------------------
@@ -94,21 +94,23 @@ func attack() -> void:
 	
 	sprite.play("boss_punch")
 	
-	await get_tree().create_timer(0.1).timeout
+	# Enable hitbox mid-animation (impact frame)
+	await get_tree().create_timer(0.3).timeout  # Activate during punch
 	if not is_instance_valid(self):
 		return
 	punch_hitbox.monitoring = true
-	
-	await get_tree().create_timer(0.05).timeout
+
+	await get_tree().create_timer(0.15).timeout  # Longer active window
 	if not is_instance_valid(self):
 		return
 	punch_hitbox.monitoring = false
-	
+
+	# Wait for animation to complete
 	await sprite.animation_finished
 	if not is_instance_valid(self):
 		return
 	state = State.IDLE
-	
+
 	await get_tree().create_timer(attack_cooldown).timeout
 	if not is_instance_valid(self):
 		return
