@@ -5,6 +5,7 @@ extends Node2D
 var combat_system
 var spawn_system
 var circular_menu
+var wave_selection_menu
 
 # Node references
 @onready var player = $player  # Your player node
@@ -26,8 +27,8 @@ func _ready():
 	setup_spawn_system()
 	setup_circular_menu()
 
-	await get_tree().create_timer(1.0).timeout
-	spawn_system.start_wave_mode()
+	# Show wave selection menu
+	show_wave_selection()
 	
 func _process(delta):
 	# Handle parallax background scrolling
@@ -76,6 +77,21 @@ func setup_spawn_system():
 	spawn_system.game_won.connect(_on_game_won)
 	
 	print("✅ Spawn System initialized")
+
+# Show wave selection menu
+func show_wave_selection():
+	var WaveSelectionScene = preload("res://scenes/WaveSelection.tscn")
+	wave_selection_menu = WaveSelectionScene.instantiate()
+	wave_selection_menu.wave_count_selected.connect(_on_wave_count_selected)
+	add_child(wave_selection_menu)
+	print("🎮 Wave Selection Menu shown")
+
+# Called when player selects wave count
+func _on_wave_count_selected(wave_count: int):
+	print("🎮 Player selected ", wave_count, " waves")
+	spawn_system.set_max_waves(wave_count)
+	await get_tree().create_timer(0.5).timeout
+	spawn_system.start_wave_mode()
 
 # ==================== SIGNAL HANDLERS ====================
 

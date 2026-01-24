@@ -11,7 +11,7 @@ var health_pickup_scene = preload("res://scenes/health_pickup.tscn")
 var boss_scene = preload("res://scenes/boss.tscn")
 
 # Wave configuration
-const MAX_WAVES = 1
+var max_waves: int = 5  # Default, can be set dynamically
 const BASE_ENEMIES_PER_WAVE = 3
 const WAVE_DELAY = 3.0
 const ENEMY_SPAWN_INTERVAL = 1.0
@@ -42,6 +42,11 @@ func _set_paused_state(state: bool) -> void:
 func set_spawn_positions(positions: Array):
 	spawn_positions = positions
 
+# Set maximum waves (call this before starting wave mode)
+func set_max_waves(waves: int):
+	max_waves = waves
+	print("🎮 Max waves set to: ", max_waves)
+
 # Start wave-based gameplay
 func start_wave_mode():
 	current_wave = 0
@@ -55,7 +60,7 @@ func start_next_wave():
 	current_wave += 1
 	
 	# Boss wave check
-	if current_wave > MAX_WAVES and not boss_spawned_flag:
+	if current_wave > max_waves and not boss_spawned_flag:
 		spawn_boss()
 		return
 	
@@ -175,10 +180,10 @@ func _on_boss_died():
 func get_wave_info() -> Dictionary:
 	return {
 		"current_wave": current_wave,
-		"max_waves": MAX_WAVES,
+		"max_waves": max_waves,
 		"enemies_alive": enemies_alive,
 		"total_killed": total_enemies_killed,
-		"is_boss_wave": current_wave > MAX_WAVES
+		"is_boss_wave": current_wave > max_waves
 	}
 
 # Spawn health pickup after wave
