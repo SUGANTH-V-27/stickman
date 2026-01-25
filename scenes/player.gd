@@ -50,7 +50,7 @@ func _ready() -> void:
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
 
-	sprite.play("idle")
+	sprite.play("idle") 
 
 # ------------------------------------------------
 func _physics_process(delta: float) -> void:
@@ -132,6 +132,54 @@ func kick() -> void:
 	await get_tree().create_timer(0.35).timeout
 	state = State.IDLE
 	sprite.play("idle")
+	
+	
+   # ------------------------------------------------
+# HITBOX SIGNALS
+# ------------------------------------------------
+
+func _on_punchhitbox_body_entered(body: Node) -> void:
+	if state != State.ATTACK:
+		return
+	if body.is_in_group("enemy"):
+		hit_sfx.play()
+		var dir := -1 if sprite.flip_h else 1
+		
+		# Aerial punch combo - more damage!
+		var damage = aerial_punch_damage if not is_on_floor() else punch_damage
+		var knockback = 350 if not is_on_floor() else 200
+		
+		body.take_damage(damage, dir, knockback)
+
+		var main = get_tree().current_scene
+		if main and main.has_method("get") and main.get("combat_system"):
+			main.combat_system.on_hit(
+				self,
+				body,
+				damage,
+				body.global_position
+			)
+
+		
+
+func _on_kickhitbox_body_entered(body: Node) -> void:
+	if state != State.ATTACK:
+		return
+	if body.is_in_group("enemy"):
+		hit_sfx.play()
+		var dir := -1 if sprite.flip_h else 1
+		body.take_damage(kick_damage, dir, 450)
+
+		var main = get_tree().current_scene
+		if main and main.has_method("get") and main.get("combat_system"):
+			main.combat_system.on_hit(
+				self,
+				body,
+				kick_damage,
+				body.global_position
+			)
+
+		
 
 # ------------------------------------------------
 # DAMAGE
