@@ -31,7 +31,11 @@ func _ready():
 	player.health = player.max_health
 	
 	
-	
+	if not player.is_connected("health_changed", Callable(self, "_on_health_changed")):
+		player.connect("health_changed", Callable(self, "_on_health_changed"))
+	if mobile_controls:
+		mobile_controls.player = player
+
 
 	# Remove static enemy
 	if enemy:
