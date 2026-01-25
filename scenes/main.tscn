@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
 [ext_resource type="Texture2D" uid="uid://ol5sgcloprn" path="res://assets/backgrounds/red_forest/7-edited final.png" id="10_choun"]
 [ext_resource type="PackedScene" uid="uid://e61ee7s4ewkj" path="res://scenes/HUD.tscn" id="11_ya4ey"]
-[ext_resource type="PackedScene" uid="uid://dr7gcu50mk5ms" path="res://scenes/mobilecontrols.tscn" id="12_eb6dy"]
+[ext_resource type="PackedScene" uid="uid://5k1m1dvw6ktp" path="res://scenes/mobilecontrols.tscn" id="12_eb6dy"]
 
 [sub_resource type="GDScript" id="GDScript_85g3d"]
 script/source = "extends Node2D
@@ -154,7 +154,8 @@ shape = SubResource("RectangleShape2D_85g3d")
 process_mode = 1
 visible = false
 
-[node name="hud" parent="." instance=ExtResource("11_ya4ey")]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Mobilecontrols" parent="." node_paths=PackedStringArray("player") instance=ExtResource("12_eb6dy")]
-player = NodePath("../player")
+[node name="Mobilecontrols" parent="CanvasLayer" instance=ExtResource("12_eb6dy")]
+
+[node name="hud" parent="CanvasLayer" instance=ExtResource("11_ya4ey")]

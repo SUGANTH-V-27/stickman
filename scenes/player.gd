@@ -1,5 +1,3 @@
-
-
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
@@ -57,9 +55,10 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	else:
-		velocity.y = 0
+		if velocity.y > 0:
+			velocity.y = 0
 
-	if Input.is_action_just_pressed("ui_up") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = -jump_force
 
 	if state in [State.DEAD, State.HIT]:
@@ -99,45 +98,43 @@ func _input(event) -> void:
 		punch()
 	elif event.is_action_pressed("kick"):
 		kick()
+	elif event.is_action_pressed("jump"):
+		jump()
 
 # ------------------------------------------------
-# ATTACKS
+# ATTACKS (Reusable helper)
 # ------------------------------------------------
-func punch() -> void:
+func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: float) -> void:
 	state = State.ATTACK
-	sprite.play("punch")
+	sprite.play(anim)
 	air_sfx.play()
 
 	await get_tree().create_timer(0.08).timeout
-	punch_hitbox.monitoring = true
+	hitbox.monitoring = true
 
-	await get_tree().create_timer(0.05).timeout
-	punch_hitbox.monitoring = false
+	await get_tree().create_timer(active_time).timeout
+	hitbox.monitoring = false
 
-	await get_tree().create_timer(0.25).timeout
-	state = State.IDLE
-	sprite.play("idle")
+	await get_tree().create_timer(cooldown).timeout
+	if not is_dying and state == State.ATTACK:
+		state = State.IDLE
+		sprite.play("idle")
+
+func punch() -> void:
+	_do_attack(punch_hitbox, "punch", 0.05, 0.25)
 
 func kick() -> void:
-	state = State.ATTACK
-	sprite.play("kick")
-	air_sfx.play()
+	_do_attack(kick_hitbox, "kick", 0.08, 0.25)
 
-	await get_tree().create_timer(0.22).timeout
-	kick_hitbox.monitoring = true
+func jump() -> void:
+	if is_on_floor():
+		velocity.y = -jump_force
+		state = State.MOVE  # or add a JUMP state if you want
+		sprite.play("jump")
 
-	await get_tree().create_timer(0.06).timeout
-	kick_hitbox.monitoring = false
-
-	await get_tree().create_timer(0.35).timeout
-	state = State.IDLE
-	sprite.play("idle")
-	
-	
-   # ------------------------------------------------
+# ------------------------------------------------
 # HITBOX SIGNALS
 # ------------------------------------------------
-
 func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
@@ -160,8 +157,6 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 				body.global_position
 			)
 
-		
-
 func _on_kickhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
@@ -178,8 +173,6 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 				kick_damage,
 				body.global_position
 			)
-
-		
 
 # ------------------------------------------------
 # DAMAGE
@@ -255,8 +248,9 @@ func _on_KickButton_pressed() -> void:
 		kick()
 
 func _on_JumpButton_pressed() -> void:
-	if is_on_floor() and state not in [State.DEAD, State.HIT]:
-		velocity.y = -jump_force
+	if state not in [State.DEAD, State.HIT]:
+		jump()
+
 
 func _on_LeftButton_pressed() -> void:
 	Input.action_press("ui_left")

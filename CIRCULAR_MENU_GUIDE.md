@@ -52,10 +52,10 @@ Edit the `MENU_ITEMS` array in [CircularMenu.gd](scenes/CircularMenu.gd):
 
 ```gdscript
 const MENU_ITEMS = [
-    {"label": "Resume", "icon": "▶", "action": "resume"},
-    {"label": "Restart", "icon": "↻", "action": "restart"},
-    {"label": "Settings", "icon": "⚙", "action": "settings"},
-    {"label": "Quit", "icon": "✖", "action": "quit"}
+	{"label": "Resume", "icon": "▶", "action": "resume"},
+	{"label": "Restart", "icon": "↻", "action": "restart"},
+	{"label": "Settings", "icon": "⚙", "action": "settings"},
+	{"label": "Quit", "icon": "✖", "action": "quit"}
 ]
 ```
 
@@ -81,20 +81,20 @@ In the `execute_menu_action()` function in [CircularMenu.gd](scenes/CircularMenu
 
 ```gdscript
 func execute_menu_action(index: int):
-    var action = MENU_ITEMS[index].action
-    
-    match action:
-        "resume":
-            close_menu()
-            get_tree().paused = false
-        "restart":
-            get_tree().reload_current_scene()
-        "settings":
-            # Your settings code here
-            pass
-        "your_custom_action":
-            # Your custom code here
-            pass
+	var action = MENU_ITEMS[index].action
+	
+	match action:
+		"resume":
+			close_menu()
+			get_tree().paused = false
+		"restart":
+			get_tree().reload_current_scene()
+		"settings":
+			# Your settings code here
+			pass
+		"your_custom_action":
+			# Your custom code here
+			pass
 ```
 
 ### Add Sound Effects
@@ -103,17 +103,17 @@ To add sound effects, place your audio files in the project and load them:
 
 ```gdscript
 func setup_sounds():
-    rotate_sound = AudioStreamPlayer.new()
-    open_sound = AudioStreamPlayer.new()
-    add_child(rotate_sound)
-    add_child(open_sound)
-    
-    # Load your sound files
-    rotate_sound.stream = load("res://sounds/rotate.mp3")
-    open_sound.stream = load("res://sounds/open.mp3")
-    
-    rotate_sound.volume_db = -10
-    open_sound.volume_db = -12
+	rotate_sound = AudioStreamPlayer.new()
+	open_sound = AudioStreamPlayer.new()
+	add_child(rotate_sound)
+	add_child(open_sound)
+	
+	# Load your sound files
+	rotate_sound.stream = load("res://sounds/rotate.mp3")
+	open_sound.stream = load("res://sounds/open.mp3")
+	
+	rotate_sound.volume_db = -10
+	open_sound.volume_db = -12
 ```
 
 ### Adjust Menu Size
@@ -152,17 +152,17 @@ You can create multiple menu configurations:
 ```gdscript
 # In-game pause menu
 var PAUSE_MENU = [
-    {"label": "Resume", "icon": "▶", "action": "resume"},
-    {"label": "Settings", "icon": "⚙", "action": "settings"},
-    {"label": "Quit", "icon": "✖", "action": "quit"}
+	{"label": "Resume", "icon": "▶", "action": "resume"},
+	{"label": "Settings", "icon": "⚙", "action": "settings"},
+	{"label": "Quit", "icon": "✖", "action": "quit"}
 ]
 
 # Main menu
 var MAIN_MENU = [
-    {"label": "Play", "icon": "▶", "action": "play"},
-    {"label": "Options", "icon": "⚙", "action": "options"},
-    {"label": "Credits", "icon": "★", "action": "credits"},
-    {"label": "Exit", "icon": "✖", "action": "exit"}
+	{"label": "Play", "icon": "▶", "action": "play"},
+	{"label": "Options", "icon": "⚙", "action": "options"},
+	{"label": "Credits", "icon": "★", "action": "credits"},
+	{"label": "Exit", "icon": "✖", "action": "exit"}
 ]
 ```
 
