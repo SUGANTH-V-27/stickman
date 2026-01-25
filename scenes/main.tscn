@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://hsx47gtwbfoc"]
+[gd_scene load_steps=15 format=3 uid="uid://hsx47gtwbfoc"]
 
 [ext_resource type="Script" uid="uid://gyicvvqocdmw" path="res://scenes/main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://cid21vx5nefym" path="res://scenes/player.tscn" id="1_o5qli"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://8x7rmlgaxubu" path="res://assets/backgrounds/red_forest/4.png" id="9_jkv2x"]
 [ext_resource type="Texture2D" uid="uid://ol5sgcloprn" path="res://assets/backgrounds/red_forest/7-edited final.png" id="10_choun"]
 [ext_resource type="PackedScene" uid="uid://e61ee7s4ewkj" path="res://scenes/HUD.tscn" id="11_ya4ey"]
+[ext_resource type="PackedScene" uid="uid://dr7gcu50mk5ms" path="res://scenes/mobilecontrols.tscn" id="12_eb6dy"]
 
 [sub_resource type="GDScript" id="GDScript_85g3d"]
 script/source = "extends Node2D
@@ -149,35 +150,11 @@ script = SubResource("GDScript_85g3d")
 position = Vector2(914, 1183)
 shape = SubResource("RectangleShape2D_85g3d")
 
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="AttackButton" type="TextureButton" parent="UI"]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -8.0
-offset_top = -8.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="KickButton" type="TextureButton" parent="UI"]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -8.0
-offset_top = -8.0
-grow_horizontal = 0
-grow_vertical = 0
-
 [node name="UI2" type="CanvasLayer" parent="."]
 process_mode = 1
 visible = false
 
 [node name="hud" parent="." instance=ExtResource("11_ya4ey")]
 
-[connection signal="pressed" from="UI/AttackButton" to="player" method="_on_attack_button_pressed"]
-[connection signal="pressed" from="UI/KickButton" to="player" method="_on_kick_button_pressed"]
+[node name="Mobilecontrols" parent="." node_paths=PackedStringArray("player") instance=ExtResource("12_eb6dy")]
+player = NodePath("../player")

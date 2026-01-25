@@ -152,6 +152,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GameOverPanel" type="ColorRect" parent="Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -159,7 +160,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0, 0, 0.95)
-visible = false
 
 [node name="Panel" type="Panel" parent="Control/GameOverPanel"]
 layout_mode = 1
@@ -261,9 +261,10 @@ custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 20
-text = "Quit to Desktop"
+text = "Quit "
 
 [node name="VictoryPanel" type="ColorRect" parent="Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -271,7 +272,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0.15, 0.1, 0.95)
-visible = false
 
 [node name="Panel" type="Panel" parent="Control/VictoryPanel"]
 layout_mode = 1

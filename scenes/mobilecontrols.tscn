@@ -1,0 +1,84 @@
+[gd_scene load_steps=2 format=3 uid="uid://dr7gcu50mk5ms"]
+
+[ext_resource type="Script" uid="uid://bwr6n6x7gdhf3" path="res://scenes/mobilecontrol.gd" id="1_5fa6u"]
+
+[node name="Mobilecontrols" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_5fa6u")
+
+[node name="LeftButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -128.0
+offset_top = -128.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(20, 580)
+text = "👈"
+
+[node name="RightButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -31.0
+offset_right = 98.0
+offset_bottom = 97.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(20, 440)
+text = "👉"
+
+[node name="JumpButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -17.0
+offset_top = -31.0
+offset_right = 111.0
+offset_bottom = 97.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(20, 300)
+text = "⬆️"
+
+[node name="AttackButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -31.0
+offset_right = 98.0
+offset_bottom = 97.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(20, 160)
+text = "👊"
+
+[node name="KickButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(20, 20)
+text = "🦵"

@@ -15,6 +15,7 @@ var selected_waves: int = 0
 @onready var enemy = $enemy    # Remove this - enemies will be spawned!
 @onready var parallax_bg = $ParallaxBackground
 @onready var hud = $hud
+@onready var mobile_controls = $Mobilecontrols
 
 func _ready():
 	print("🎮 Main scene loaded!")
@@ -28,9 +29,9 @@ func _ready():
 
 	# Initialize player health
 	player.health = player.max_health
-	# Connect death signal
 	
-
+	
+	
 
 	# Remove static enemy
 	if enemy:
