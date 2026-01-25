@@ -151,6 +151,7 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 func die() -> void:
 	state = State.DEAD
 	sprite.play("death")
+	
 	await sprite.animation_finished
 	queue_free()
 

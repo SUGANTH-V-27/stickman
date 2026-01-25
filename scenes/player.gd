@@ -42,7 +42,7 @@ func _ready() -> void:
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = health
-	
+	set_process_mode(Node.PROCESS_MODE_INHERIT)
 
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
@@ -229,6 +229,10 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 		
 	state = State.IDLE
 	sprite.play("idle")
+	
+	
+signal player_died
+
 
 
 func die() -> void:
@@ -242,10 +246,10 @@ func die() -> void:
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
 	sprite.play("death")
+	emit_signal("player_died")
 	print("💀 PLAYER DIED! Final Health: ", health)
 	await sprite.animation_finished
-	if is_instance_valid(self):
-		queue_free()
+	_set_paused_state(true)
 
 
 # ------------------------------------------------

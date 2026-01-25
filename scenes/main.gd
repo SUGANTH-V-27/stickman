@@ -12,12 +12,16 @@ var wave_selection_menu
 @onready var player = $player  # Your player node
 @onready var enemy = $enemy    # Remove this - enemies will be spawned!
 @onready var parallax_bg = $ParallaxBackground
+@onready var hud = $hud
 
 func _ready():
 	print("🎮 Main scene loaded!")
 
 	# Initialize player health
 	player.health = player.max_health
+	# Connect death signal
+	
+
 
 	# Remove static enemy
 	if enemy:
@@ -136,6 +140,9 @@ func setup_circular_menu():
 	circular_menu = CircularMenuScene.instantiate()
 	add_child(circular_menu)
 	print("✅ New Circular Menu initialized")
+
+
+
 
 # Handle pause/resume (called from menu)
 func _input(event):
