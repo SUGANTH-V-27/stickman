@@ -7,7 +7,6 @@ var spawn_system
 var circular_menu
 var instructions_menu
 var wave_selection_menu
-var hud
 
 var selected_waves: int = 0
 
@@ -15,18 +14,23 @@ var selected_waves: int = 0
 @onready var player = $player  # Your player node
 @onready var enemy = $enemy    # Remove this - enemies will be spawned!
 @onready var parallax_bg = $ParallaxBackground
+@onready var hud = $hud
 
 func _ready():
 	print("🎮 Main scene loaded!")
-
-	# Add HUD (UI layer)
-	var HUDScene = preload("res://scenes/HUD.tscn")
-	hud = HUDScene.instantiate()
-	add_child(hud)
+	# HUD is already instanced in main.tscn as node "hud".
+	# If it ever goes missing, fallback to instantiating it.
+	if not is_instance_valid(hud):
+		var HUDScene = preload("res://scenes/HUD.tscn")
+		hud = HUDScene.instantiate()
+		add_child(hud)
 
 
 	# Initialize player health
 	player.health = player.max_health
+	# Connect death signal
+	
+
 
 	# Remove static enemy
 	if enemy:
@@ -184,6 +188,9 @@ func setup_circular_menu():
 	circular_menu = CircularMenuScene.instantiate()
 	add_child(circular_menu)
 	print("✅ New Circular Menu initialized")
+
+
+
 
 # Handle pause/resume (called from menu)
 func _input(event):

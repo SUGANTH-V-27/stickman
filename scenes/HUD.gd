@@ -1,8 +1,5 @@
 extends CanvasLayer
 
-# HUD Script
-# Handles UI elements like menu button and circular menu
-
 @onready var menu_button: Button = $Control/MenuButton
 @onready var circular_menu: Control = $Control/CircularMenu
 @onready var game_over_panel: Control = $Control/GameOverPanel
@@ -13,11 +10,12 @@ extends CanvasLayer
 @onready var v_quit: Button = $Control/VictoryPanel/Panel/VBox/QuitButton
 
 func _ready():
-	# Hide circular menu initially
+	# HUD should keep running even when paused
+	set_process_mode(Node.PROCESS_MODE_WHEN_PAUSED)
+
 	if circular_menu:
 		circular_menu.visible = false
-	
-	# Connect menu button
+
 	if menu_button:
 		menu_button.pressed.connect(_on_menu_button_pressed)
 
@@ -38,7 +36,6 @@ func _ready():
 		victory_panel.visible = false
 
 func _on_menu_button_pressed():
-	# Toggle circular menu visibility
 	if circular_menu:
 		circular_menu.visible = !circular_menu.visible
 		

@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://e61ee7s4ewkj"]
 
-[ext_resource type="Script" path="res://scenes/HUD.gd" id="1_qpvh6"]
+[ext_resource type="Script" uid="uid://cdecqyboeekne" path="res://scenes/HUD.gd" id="1_qpvh6"]
 
-[node name="HUD" type="CanvasLayer"]
-process_mode = 3
+[node name="hud" type="CanvasLayer"]
+process_mode = 2
 script = ExtResource("1_qpvh6")
 
 [node name="Control" type="Control" parent="."]

@@ -50,7 +50,7 @@ func _ready() -> void:
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = health
-	
+	set_process_mode(Node.PROCESS_MODE_INHERIT)
 
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
@@ -254,6 +254,10 @@ func _call_hit_recover() -> void:
 	_hit_recovering = false
 	state = State.IDLE
 	sprite.play("idle")
+	
+	
+signal player_died
+
 
 
 func die() -> void:
