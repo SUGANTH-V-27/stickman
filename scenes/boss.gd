@@ -1,11 +1,26 @@
 extends CharacterBody2D
 
 # -------------------- CONFIG --------------------
-@export var speed := 80.0  # Slower than normal enemies
-@export var max_health := 300  # Much more health
-@export var attack_damage := 40  # More damage
-@export var attack_cooldown := 1.2  # Faster attacks for challenge
+@export var speed := 120.0  # Base move speed
+@export var max_health := 450  # Tankier boss
+@export var attack_damage := 45  # Base damage
+@export var attack_cooldown := 0.85  # Base cooldown
 @export var gravity := 2000.0
+
+# Attack timing (seconds)
+@export var attack_windup := 0.18
+@export var hitbox_active_time := 0.22
+@export var lunge_speed := 240.0
+
+# Hit reaction tuning
+@export var hit_stun_time := 0.12
+@export var min_hit_interval := 0.18  # prevents stunlock
+
+# Enrage phase
+@export var enrage_threshold := 0.5  # < 50% HP
+@export var enrage_speed_multiplier := 1.35
+@export var enrage_cooldown_multiplier := 0.65
+@export var enrage_damage_bonus := 10
 
 # -------------------- STATE --------------------
 enum State { IDLE, MOVE, ATTACK, HIT, DEAD }
@@ -14,6 +29,8 @@ var state: State = State.IDLE
 var health := 0
 var player: CharacterBody2D
 var can_attack := true
+var _last_hit_ms := 0
+var _enraged := false
 
 # -------------------- NODES --------------------
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -37,6 +54,22 @@ func _ready() -> void:
 	
 	print("🔥 BOSS SPAWNED with ", health, " HP!")
 
+
+func _is_enraged() -> bool:
+	return float(health) <= float(max_health) * enrage_threshold
+
+
+func _current_speed() -> float:
+	return speed * (enrage_speed_multiplier if _is_enraged() else 1.0)
+
+
+func _current_damage() -> int:
+	return attack_damage + (enrage_damage_bonus if _is_enraged() else 0)
+
+
+func _current_cooldown() -> float:
+	return attack_cooldown * (enrage_cooldown_multiplier if _is_enraged() else 1.0)
+
 # ------------------------------------------------
 
 func _physics_process(delta: float) -> void:
@@ -59,15 +92,21 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	if state == State.ATTACK:
-		velocity.x = 0
+		# Attack movement handled inside attack()
 		move_and_slide()
 		return
 	
 	sprite.flip_h = player.global_position.x < global_position.x
 	
+	# Phase swap message (one-time)
+	if _is_enraged() and not _enraged:
+		_enraged = true
+		print("😡 BOSS ENRAGED!")
+
 	if not attack_range.has_overlapping_bodies():
 		state = State.MOVE
-		velocity.x = -speed if sprite.flip_h else speed
+		var move_speed := _current_speed()
+		velocity.x = -move_speed if sprite.flip_h else move_speed
 		sprite.play("boss_walk")
 		move_and_slide()
 		return
@@ -95,15 +134,20 @@ func attack() -> void:
 	sprite.play("boss_punch")
 	
 	# Enable hitbox mid-animation (impact frame)
-	await get_tree().create_timer(0.3).timeout  # Activate during punch
+	await get_tree().create_timer(attack_windup).timeout  # Faster windup
 	if not is_instance_valid(self):
 		return
+
+	# Lunge forward for pressure
+	var dir := -1 if sprite.flip_h else 1
+	velocity.x = dir * lunge_speed
 	punch_hitbox.monitoring = true
 
-	await get_tree().create_timer(0.15).timeout  # Longer active window
+	await get_tree().create_timer(hitbox_active_time).timeout
 	if not is_instance_valid(self):
 		return
 	punch_hitbox.monitoring = false
+	velocity.x = 0
 
 	# Wait for animation to complete
 	await sprite.animation_finished
@@ -111,7 +155,7 @@ func attack() -> void:
 		return
 	state = State.IDLE
 
-	await get_tree().create_timer(attack_cooldown).timeout
+	await get_tree().create_timer(_current_cooldown()).timeout
 	if not is_instance_valid(self):
 		return
 	can_attack = true
@@ -129,7 +173,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if body.has_method("take_damage"):
 		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
-		body.take_damage(attack_damage, dir, 300)  # More knockback
+		body.take_damage(_current_damage(), dir, 320)
 		
 		# Show damage effects - with safety checks
 		var main = get_tree().current_scene
@@ -139,7 +183,7 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 				combat_sys.on_hit(
 					self,
 					body,
-					attack_damage,
+					_current_damage(),
 					body.global_position
 				)
 
@@ -150,6 +194,12 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	if not is_instance_valid(self) or state == State.DEAD:
 		return
+
+	# Anti-stunlock: ignore ultra-rapid hits
+	var now_ms := Time.get_ticks_msec()
+	if now_ms - _last_hit_ms < int(min_hit_interval * 1000.0):
+		return
+	_last_hit_ms = now_ms
 	
 	punch_hitbox.monitoring = false
 	can_attack = false
@@ -162,7 +212,7 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	
 	print("🔥 BOSS HIT! Health: ", health, "/", max_health)
 	
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().create_timer(hit_stun_time).timeout
 	if not is_instance_valid(self):
 		return
 	velocity.x = 0
@@ -173,7 +223,7 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	
 	state = State.IDLE
 	sprite.play("boss_idle")
-	await get_tree().create_timer(attack_cooldown).timeout
+	await get_tree().create_timer(_current_cooldown()).timeout
 	if not is_instance_valid(self):
 		return
 	can_attack = true
@@ -190,6 +240,10 @@ func die() -> void:
 	sprite.play("death")
 	print("💀 BOSS DEFEATED!")
 	await sprite.animation_finished
+	# Notify main scene of victory
+	var main = get_tree().current_scene
+	if is_instance_valid(main) and main.has_method("show_victory"):
+		main.show_victory()
 	if is_instance_valid(self):
 		queue_free()
 

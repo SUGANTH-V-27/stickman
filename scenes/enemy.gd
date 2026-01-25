@@ -39,6 +39,14 @@ func _ready() -> void:
 # ------------------------------------------------
 
 func _physics_process(delta: float) -> void:
+	# Safety check for player reference
+	if not is_instance_valid(player):
+		var players = get_tree().get_nodes_in_group("player")
+		if players.size() > 0:
+			player = players[0]
+		else:
+			return
+	
 	# ---- gravity ----
 	if not is_on_floor():
 		velocity.y += gravity * delta
@@ -102,9 +110,14 @@ func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("player"):
+		print("👊 Enemy attacking player! Damage: ", attack_damage)
 		hit_sfx.play()  
 		var dir := -1 if sprite.flip_h else 1
-		body.take_damage(attack_damage, dir, 200)
+		if body.has_method("take_damage"):
+			body.take_damage(attack_damage, dir, 200)
+			print("✅ Damage call successful")
+		else:
+			print("❌ ERROR: Player doesn't have take_damage method!")
 		
 		# Show damage effects
 		var main = get_tree().current_scene

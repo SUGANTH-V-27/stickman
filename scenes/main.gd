@@ -7,6 +7,9 @@ var spawn_system
 var circular_menu
 var instructions_menu
 var wave_selection_menu
+var hud
+
+var selected_waves: int = 0
 
 # Node references
 @onready var player = $player  # Your player node
@@ -15,6 +18,12 @@ var wave_selection_menu
 
 func _ready():
 	print("🎮 Main scene loaded!")
+
+	# Add HUD (UI layer)
+	var HUDScene = preload("res://scenes/HUD.tscn")
+	hud = HUDScene.instantiate()
+	add_child(hud)
+
 
 	# Initialize player health
 	player.health = player.max_health
@@ -28,7 +37,16 @@ func _ready():
 	setup_spawn_system()
 	setup_circular_menu()
 
-	# Show instructions first
+	# If player already chose waves (e.g. after Retry), restart immediately from Wave 1
+	if get_tree().has_meta("selected_waves"):
+		var saved = int(get_tree().get_meta("selected_waves"))
+		if saved > 0:
+			selected_waves = saved
+			print("🔁 Restarting with saved waves: ", selected_waves)
+			_start_wave_run(selected_waves)
+			return
+
+	# Show instructions first (fresh start)
 	show_instructions()
 	
 func _process(delta):
@@ -103,8 +121,23 @@ func show_wave_selection():
 # Called when player selects wave count
 func _on_wave_count_selected(wave_count: int):
 	print("🎮 Player selected ", wave_count, " waves")
+	selected_waves = wave_count
+	get_tree().set_meta("selected_waves", selected_waves)
+	_start_wave_run(selected_waves)
+
+
+func _start_wave_run(wave_count: int) -> void:
+	# Clean up menus if they exist
+	if is_instance_valid(instructions_menu):
+		instructions_menu.queue_free()
+		instructions_menu = null
+	if is_instance_valid(wave_selection_menu):
+		wave_selection_menu.queue_free()
+		wave_selection_menu = null
+
 	spawn_system.set_max_waves(wave_count)
-	await get_tree().create_timer(0.5).timeout
+	# Defer start slightly so everything is ready after a reload
+	await get_tree().create_timer(0.1).timeout
 	spawn_system.start_wave_mode()
 
 # ==================== SIGNAL HANDLERS ====================
@@ -123,11 +156,26 @@ func _on_boss_spawned():
 	print("📢 UI: BOSS FIGHT!")
 	# TODO: Show boss warning
 	# Example: $BossWarning.visible = true
+	# Optionally show a boss warning UI in HUD
+	if hud and hud.has_method("show_boss_warning"):
+		hud.show_boss_warning()
 
 func _on_game_won():
 	print("📢 UI: VICTORY!")
 	# TODO: Show victory screen
 	# Example: $VictoryScreen.visible = true
+	if hud and hud.has_method("show_victory"):
+		hud.show_victory()
+
+
+func show_game_over():
+	if hud and hud.has_method("show_game_over"):
+		hud.show_game_over()
+
+
+func show_victory():
+	if hud and hud.has_method("show_victory"):
+		hud.show_victory()
 
 # Setup circular menu
 func setup_circular_menu():

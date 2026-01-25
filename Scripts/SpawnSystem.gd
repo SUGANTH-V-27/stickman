@@ -24,6 +24,8 @@ var wave_active: bool = false
 var boss_spawned_flag: bool = false
 var paused: bool = false   # <-- pause flag
 
+var shutting_down: bool = false
+
 # References
 var scene_root: Node = null
 var spawn_positions: Array = []
@@ -31,8 +33,21 @@ var spawn_positions: Array = []
 func _ready():
 	add_to_group("pausable")   # HUD can now pause/resume this system
 
+
+func _exit_tree() -> void:
+	shutting_down = true
+
 func _init(scene):
 	scene_root = scene
+
+
+func _get_scene_root() -> Node:
+	if is_instance_valid(scene_root):
+		return scene_root
+	var tree := get_tree()
+	if tree:
+		return tree.current_scene
+	return null
 
 # Called by HUD pause menu
 func _set_paused_state(state: bool) -> void:
@@ -76,16 +91,25 @@ func start_next_wave():
 # Pause-aware spawn loop
 func _spawn_loop(enemy_count: int) -> void:
 	for i in range(enemy_count):
+		if shutting_down or not is_instance_valid(self):
+			return
 		# Freeze while paused
 		while paused:
+			if shutting_down or not is_instance_valid(self):
+				return
 			await get_tree().process_frame
 		
 		# Timer that halts when paused
-		var timer = scene_root.get_tree().create_timer(ENEMY_SPAWN_INTERVAL, false)
+		var tree := get_tree()
+		if not tree:
+			return
+		var timer = tree.create_timer(ENEMY_SPAWN_INTERVAL, false)
 		await timer.timeout
 		
 		# Double-check pause before spawning
 		while paused:
+			if shutting_down or not is_instance_valid(self):
+				return
 			await get_tree().process_frame
 		
 		spawn_enemy()
@@ -96,11 +120,17 @@ func get_enemies_for_wave(wave: int) -> int:
 
 # Spawn single enemy
 func spawn_enemy():
+	if shutting_down or not is_instance_valid(self):
+		return null
+	var root := _get_scene_root()
+	if root == null:
+		return null
+
 	var enemy = enemy_scene.instantiate()
 	var spawn_pos = get_random_spawn_position()
 	enemy.global_position = spawn_pos
 	
-	scene_root.add_child(enemy)
+	root.add_child(enemy)
 	enemies_alive += 1
 	
 	if not enemy.is_connected("tree_exited", _on_enemy_died):
@@ -140,18 +170,33 @@ func on_wave_complete():
 # Pause-aware delay before next wave
 func _delayed_next_wave() -> void:
 	while paused:
+		if shutting_down or not is_instance_valid(self):
+			return
 		await get_tree().process_frame
-	
-	var timer = scene_root.get_tree().create_timer(WAVE_DELAY, false)
+
+	if shutting_down or not is_instance_valid(self):
+		return
+	var tree := get_tree()
+	if not tree:
+		return
+	var timer = tree.create_timer(WAVE_DELAY, false)
 	await timer.timeout
 	
 	while paused:
+		if shutting_down or not is_instance_valid(self):
+			return
 		await get_tree().process_frame
 	
 	start_next_wave()
 
 # Spawn boss
 func spawn_boss():
+	if shutting_down or not is_instance_valid(self):
+		return
+	var root := _get_scene_root()
+	if root == null:
+		return
+
 	boss_spawned_flag = true
 	emit_signal("boss_spawned")
 	print("🔥 BOSS WAVE!")
@@ -161,7 +206,7 @@ func spawn_boss():
 	var spawn_pos = get_random_spawn_position()
 	boss.global_position = spawn_pos
 	
-	scene_root.add_child(boss)
+	root.add_child(boss)
 	enemies_alive += 1
 	
 	# Connect death signal
@@ -188,16 +233,22 @@ func get_wave_info() -> Dictionary:
 
 # Spawn health pickup after wave
 func spawn_health_pickup():
+	if shutting_down or not is_instance_valid(self):
+		return
+	var root := _get_scene_root()
+	if root == null:
+		return
+
 	var health_pickup = health_pickup_scene.instantiate()
 	
 	# Spawn at center of arena, on ground
-	var player = scene_root.get_node_or_null("player")
+	var player = root.get_node_or_null("player")
 	if player:
 		health_pickup.global_position = Vector2(player.global_position.x, 1005)
 	else:
 		health_pickup.global_position = Vector2(5300, 1005)
 	
-	scene_root.add_child(health_pickup)
+	root.add_child(health_pickup)
 	print("💊 Health pickup spawned!")
 
 # Reset system
@@ -207,3 +258,4 @@ func reset():
 	total_enemies_killed = 0
 	wave_active = false
 	boss_spawned_flag = false
+	paused = false

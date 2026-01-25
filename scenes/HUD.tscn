@@ -150,3 +150,234 @@ offset_right = -106.0
 offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="GameOverPanel" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0, 0, 0.95)
+visible = false
+
+[node name="Panel" type="Panel" parent="Control/GameOverPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -250.0
+offset_right = 400.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Control/GameOverPanel/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.05, 0.05, 0.9)
+
+[node name="BorderTop" type="ColorRect" parent="Control/GameOverPanel/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 5.0
+grow_horizontal = 2
+color = Color(0.8, 0.1, 0.1, 1)
+
+[node name="BorderBottom" type="ColorRect" parent="Control/GameOverPanel/Panel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.8, 0.1, 0.1, 1)
+
+[node name="VBox" type="VBoxContainer" parent="Control/GameOverPanel/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Spacer1" type="Control" parent="Control/GameOverPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Skull" type="Label" parent="Control/GameOverPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "💀"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Control/GameOverPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 64
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Control/GameOverPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "You have fallen in battle..."
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="Control/GameOverPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="RetryButton" type="Button" parent="Control/GameOverPanel/Panel/VBox"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 28
+text = "⚔️ RETRY"
+
+[node name="Spacer3" type="Control" parent="Control/GameOverPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="Control/GameOverPanel/Panel/VBox"]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "Quit to Desktop"
+
+[node name="VictoryPanel" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.15, 0.1, 0.95)
+visible = false
+
+[node name="Panel" type="Panel" parent="Control/VictoryPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -250.0
+offset_right = 400.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Control/VictoryPanel/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.2, 0.1, 0.9)
+
+[node name="BorderTop" type="ColorRect" parent="Control/VictoryPanel/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 5.0
+grow_horizontal = 2
+color = Color(0.4, 0.9, 0.3, 1)
+
+[node name="BorderBottom" type="ColorRect" parent="Control/VictoryPanel/Panel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.4, 0.9, 0.3, 1)
+
+[node name="VBox" type="VBoxContainer" parent="Control/VictoryPanel/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Spacer1" type="Control" parent="Control/VictoryPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="Trophy" type="Label" parent="Control/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "🏆"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Control/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 1, 0.3, 1)
+theme_override_font_sizes/font_size = 56
+text = "VICTORY!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Control/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 32
+text = "Boss Defeated!"
+horizontal_alignment = 1
+
+[node name="Flavor" type="Label" parent="Control/VictoryPanel/Panel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "You have conquered the arena!"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="Control/VictoryPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="Control/VictoryPanel/Panel/VBox"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8, 1, 0.8, 1)
+theme_override_font_sizes/font_size = 28
+text = "🔁 PLAY AGAIN"
+
+[node name="Spacer3" type="Control" parent="Control/VictoryPanel/Panel/VBox"]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="Control/VictoryPanel/Panel/VBox"]
+custom_minimum_size = Vector2(300, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+text = "Quit to Desktop"

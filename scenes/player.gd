@@ -18,6 +18,8 @@ var health := 0
 var is_dying := false  # Prevents multiple death calls
 signal health_changed(current: int, max: int)
 
+var _hit_recovering := false
+
 
 # -------------------- NODES --------------------
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -37,6 +39,12 @@ const CAMERA_Y := 540.0
 func _ready() -> void:
 	health = max_health
 	z_index = 10
+	add_to_group("player")  # Ensure player is in player group
+	state = State.IDLE
+	is_dying = false
+	_hit_recovering = false
+	
+	print("🎮 Player initialized with health: ", health, "/", max_health)
 
 	# Setup health bar
 	if health_bar:
@@ -197,55 +205,65 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 # DAMAGE
 # ------------------------------------------------
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
-	# Prevent taking damage if already dead, dying, or currently being hit
-	if state == State.DEAD or is_dying or state == State.HIT:
+	# Only block if actually dead
+	if state == State.DEAD or is_dying:
 		return
 
-	state = State.HIT
-	health -= amount
-	health = max(health, 0)
+	health = max(health - amount, 0)
 
-	# Update health bar AFTER reducing health
+	# Always update health UI
 	if health_bar:
 		health_bar.value = health
-
 	emit_signal("health_changed", health, max_health)
 
-	# Check for death BEFORE applying knockback and animation
+	# Death: show game over immediately (don't await animations; game may pause)
 	if health <= 0:
-		is_dying = true  # Set flag immediately to block further damage
-		die()
+		is_dying = true
+		state = State.DEAD
+		velocity = Vector2.ZERO
+		punch_hitbox.monitoring = false
+		kick_hitbox.monitoring = false
+		sprite.play("death")
+
+		var main = get_tree().current_scene
+		if is_instance_valid(main) and main.has_method("show_game_over"):
+			main.show_game_over()
 		return
 
-	velocity.x = knockback_dir * force
-	move_and_slide()
+	# Hit-stun: avoid stacking multiple awaits (can leave player stuck)
+	if state != State.HIT:
+		state = State.HIT
+		_hit_recovering = true
+		velocity.x = knockback_dir * force
+		move_and_slide()
+		sprite.play("hit")
+		_call_hit_recover()
+	else:
+		# Already in hit-stun; just apply a small shove
+		velocity.x = knockback_dir * force * 0.2
+		move_and_slide()
 
-	sprite.play("hit")
-	await sprite.animation_finished
-	
-	# Double check we're still alive after animation
-	if state == State.DEAD:
+
+func _call_hit_recover() -> void:
+	if not _hit_recovering:
 		return
-		
+	# Fixed duration recovery so we don't rely on animation_finished
+	await get_tree().create_timer(0.25).timeout
+	if not is_instance_valid(self) or state == State.DEAD or is_dying:
+		return
+	_hit_recovering = false
 	state = State.IDLE
 	sprite.play("idle")
 
 
 func die() -> void:
-	# Prevent multiple death calls
-	if state == State.DEAD:
+	# Kept for compatibility; delegate to take_damage death path
+	if state == State.DEAD or is_dying:
 		return
-	
-	state = State.DEAD
-	is_dying = true
-	velocity.x = 0
-	punch_hitbox.monitoring = false
-	kick_hitbox.monitoring = false
-	sprite.play("death")
-	print("💀 PLAYER DIED! Final Health: ", health)
-	await sprite.animation_finished
-	if is_instance_valid(self):
-		queue_free()
+	health = 0
+	if health_bar:
+		health_bar.value = health
+	take_damage(0, 0, 0)
 
 
 # ------------------------------------------------
