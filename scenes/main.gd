@@ -4,7 +4,6 @@ extends Node2D
 # Systems
 var combat_system
 var spawn_system
-var circular_menu
 var instructions_menu
 var wave_selection_menu
 
@@ -53,7 +52,6 @@ func _ready():
 	# Initialize systems ONCE
 	setup_combat_system()
 	setup_spawn_system()
-	setup_circular_menu()
 
 	# If player already chose waves (e.g. after Retry), restart immediately from Wave 1
 	if get_tree().has_meta("selected_waves"):
@@ -166,11 +164,6 @@ func show_victory():
 	if hud and hud.has_method("show_victory"):
 		hud.show_victory()
 
-func setup_circular_menu():
-	var CircularMenuScene = preload("res://scenes/CircularMenu.tscn")
-	circular_menu = CircularMenuScene.instantiate()
-	add_child(circular_menu)
-	print("✅ New Circular Menu initialized")
 
 func _input(event):
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
