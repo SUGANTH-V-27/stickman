@@ -17,20 +17,25 @@ var is_dying := false
 signal health_changed(current: int, max: int)
 
 var _hit_recovering := false
-var lock_movement_during_attack := false
 
 # -------------------- NODES --------------------
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var punch_hitbox: Area2D = $punchhitbox
 @onready var kick_hitbox: Area2D = $kickhitbox
 @onready var health_bar: ProgressBar = $HealthBar
-
-@onready var camera: Camera2D = $Camera2D
 @onready var air_sfx: AudioStreamPlayer = $AudioStreamPlayer/air_sfx
 @onready var hit_sfx: AudioStreamPlayer = $AudioStreamPlayer/hit_sfx
 @onready var walk_sfx: AudioStreamPlayer = $AudioStreamPlayer/walk_sfx
 
-const CAMERA_Y := 540.0
+# -------------------- INPUT STATE --------------------
+# Shared flags for keyboard + mobile buttons
+var input_states := {
+	"ui_left": false,
+	"ui_right": false,
+	"jump": false,
+	"attack": false,
+	"kick": false
+}
 
 # ------------------------------------------------
 func _ready() -> void:
@@ -44,40 +49,57 @@ func _ready() -> void:
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = health
-	set_process_mode(Node.PROCESS_MODE_INHERIT)
 
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
-
 	sprite.play("idle")
 
+# ------------------------------------------------
+# KEYBOARD INPUT
+# ------------------------------------------------
+func _input(event) -> void:
+	if event.is_action_pressed("attack"): input_states["attack"] = true
+	if event.is_action_released("attack"): input_states["attack"] = false
+
+	if event.is_action_pressed("kick"): input_states["kick"] = true
+	if event.is_action_released("kick"): input_states["kick"] = false
+
+	if event.is_action_pressed("jump"): input_states["jump"] = true
+	if event.is_action_released("jump"): input_states["jump"] = false
+
+	if event.is_action_pressed("ui_left"): input_states["ui_left"] = true
+	if event.is_action_released("ui_left"): input_states["ui_left"] = false
+
+	if event.is_action_pressed("ui_right"): input_states["ui_right"] = true
+	if event.is_action_released("ui_right"): input_states["ui_right"] = false
+
+# ------------------------------------------------
+# MAIN LOOP
 # ------------------------------------------------
 func _physics_process(delta: float) -> void:
 	# Gravity
 	if not is_on_floor():
 		velocity.y += gravity * delta
-	else:
-		if velocity.y > 0:
-			velocity.y = 0
+	elif velocity.y > 0:
+		velocity.y = 0
 
 	# Jump
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if input_states["jump"] and is_on_floor():
 		velocity.y = -jump_force
+		input_states["jump"] = false
+		state = State.MOVE
+		sprite.play("jump")
 
-	# Restrict movement when hit or dead
+	# Restrict movement when hit/dead
 	if state in [State.DEAD, State.HIT]:
 		velocity.x = 0
 		move_and_slide()
 		return
 
-	# Restrict movement during attack only if flagged
-	if state == State.ATTACK and is_on_floor() and lock_movement_during_attack:
-		velocity.x = 0
-		move_and_slide()
-		return
-
 	# Movement
-	var dir := Input.get_axis("ui_left", "ui_right")
+	var dir := 0
+	if input_states["ui_left"]: dir -= 1
+	if input_states["ui_right"]: dir += 1
 	velocity.x = dir * speed
 	move_and_slide()
 
@@ -96,23 +118,19 @@ func _physics_process(delta: float) -> void:
 		if not walk_sfx.playing:
 			walk_sfx.play()
 
-# ------------------------------------------------
-func _input(event) -> void:
-	if state in [State.DEAD, State.HIT, State.ATTACK]:
-		return
-
-	if event.is_action_pressed("attack"):
+	# Attacks (can overlap with movement/jump)
+	if input_states["attack"] and state not in [State.DEAD, State.HIT]:
 		punch()
-	elif event.is_action_pressed("kick"):
+		input_states["attack"] = false
+	if input_states["kick"] and state not in [State.DEAD, State.HIT]:
 		kick()
-	elif event.is_action_pressed("jump"):
-		jump()
+		input_states["kick"] = false
 
 # ------------------------------------------------
 # ATTACKS
-func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: float, lock_move := false) -> void:
+# ------------------------------------------------
+func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: float) -> void:
 	state = State.ATTACK
-	lock_movement_during_attack = lock_move
 	sprite.play(anim)
 	air_sfx.play()
 
@@ -128,10 +146,10 @@ func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: floa
 		sprite.play("idle")
 
 func punch() -> void:
-	_do_attack(punch_hitbox, "punch", 0.05, 0.25, false)  # allow movement
+	_do_attack(punch_hitbox, "punch", 0.05, 0.25)
 
 func kick() -> void:
-	_do_attack(kick_hitbox, "kick", 0.08, 0.25, true)     # lock movement
+	_do_attack(kick_hitbox, "kick", 0.08, 0.25)
 
 func jump() -> void:
 	if is_on_floor():
@@ -141,44 +159,31 @@ func jump() -> void:
 
 # ------------------------------------------------
 # HITBOX SIGNALS
+# ------------------------------------------------
 func _on_punchhitbox_body_entered(body: Node) -> void:
-	if state != State.ATTACK:
-		return
+	if state != State.ATTACK: return
 	if body.is_in_group("enemy"):
 		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
-
-		# Aerial punch combo - more damage!
 		var damage = aerial_punch_damage if not is_on_floor() else punch_damage
 		var knockback = 350 if not is_on_floor() else 200
-
 		body.take_damage(damage, dir, knockback)
 
-		var main = get_tree().current_scene
-		if main and main.has_method("get") and main.get("combat_system"):
-			main.combat_system.on_hit(self, body, damage, body.global_position)
-
 func _on_kickhitbox_body_entered(body: Node) -> void:
-	if state != State.ATTACK:
-		return
+	if state != State.ATTACK: return
 	if body.is_in_group("enemy"):
 		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
 		body.take_damage(kick_damage, dir, 450)
 
-		var main = get_tree().current_scene
-		if main and main.has_method("get") and main.get("combat_system"):
-			main.combat_system.on_hit(self, body, kick_damage, body.global_position)
-
 # ------------------------------------------------
 # DAMAGE
+# ------------------------------------------------
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
-	if state == State.DEAD or is_dying:
-		return
+	if state == State.DEAD or is_dying: return
 
 	health = max(health - amount, 0)
-	if health_bar:
-		health_bar.value = health
+	if health_bar: health_bar.value = health
 	emit_signal("health_changed", health, max_health)
 
 	if health <= 0:
@@ -188,7 +193,6 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 		punch_hitbox.monitoring = false
 		kick_hitbox.monitoring = false
 		sprite.play("death")
-
 		var main = get_tree().current_scene
 		if is_instance_valid(main) and main.has_method("show_game_over"):
 			main.show_game_over()
@@ -206,26 +210,36 @@ func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 		move_and_slide()
 
 func _call_hit_recover() -> void:
-	if not _hit_recovering:
-		return
+	if not _hit_recovering: return
 	await get_tree().create_timer(0.25).timeout
-	if not is_instance_valid(self) or state == State.DEAD or is_dying:
-		return
+	if not is_instance_valid(self) or state == State.DEAD or is_dying: return
 	_hit_recovering = false
 	state = State.IDLE
 	sprite.play("idle")
 
 func die() -> void:
-	if state == State.DEAD or is_dying:
-		return
+	if state == State.DEAD or is_dying: return
 	health = 0
-	if health_bar:
-		health_bar.value = health
+	if health_bar: health_bar.value = health
 	take_damage(0, 0, 0)
 
 # ------------------------------------------------
 # PAUSE SUPPORT
+# ------------------------------------------------
 func _set_paused_state(paused: bool) -> void:
 	set_process(!paused)
 	set_physics_process(!paused)
 	set_process_input(!paused)
+
+# ------------------------------------------------
+# MOBILE CONTROL HOOKS
+# ------------------------------------------------
+func _on_AttackButton_pressed(): input_states["attack"] = true
+func _on_KickButton_pressed(): input_states["kick"] = true
+func _on_JumpButton_pressed(): input_states["jump"] = true
+
+func _on_LeftButton_pressed(): input_states["ui_left"] = true
+func _on_LeftButton_released(): input_states["ui_left"] = true
+
+func _on_RightButton_pressed(): input_states["ui_left"] = true
+func _on_RightButton_released(): input_states["ui_left"] = true
