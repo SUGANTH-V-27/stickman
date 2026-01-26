@@ -17,6 +17,7 @@ var is_dying := false
 signal health_changed(current: int, max: int)
 
 var _hit_recovering := false
+var lock_movement_during_attack := false
 
 # -------------------- NODES --------------------
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -48,33 +49,39 @@ func _ready() -> void:
 	punch_hitbox.monitoring = false
 	kick_hitbox.monitoring = false
 
-	sprite.play("idle") 
+	sprite.play("idle")
 
 # ------------------------------------------------
 func _physics_process(delta: float) -> void:
+	# Gravity
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	else:
 		if velocity.y > 0:
 			velocity.y = 0
 
+	# Jump
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = -jump_force
 
+	# Restrict movement when hit or dead
 	if state in [State.DEAD, State.HIT]:
 		velocity.x = 0
 		move_and_slide()
 		return
 
-	if state == State.ATTACK and is_on_floor():
+	# Restrict movement during attack only if flagged
+	if state == State.ATTACK and is_on_floor() and lock_movement_during_attack:
 		velocity.x = 0
 		move_and_slide()
 		return
 
+	# Movement
 	var dir := Input.get_axis("ui_left", "ui_right")
 	velocity.x = dir * speed
 	move_and_slide()
 
+	# Animations
 	if dir == 0 and is_on_floor() and state != State.ATTACK:
 		state = State.IDLE
 		sprite.play("idle")
@@ -102,10 +109,10 @@ func _input(event) -> void:
 		jump()
 
 # ------------------------------------------------
-# ATTACKS (Reusable helper)
-# ------------------------------------------------
-func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: float) -> void:
+# ATTACKS
+func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: float, lock_move := false) -> void:
 	state = State.ATTACK
+	lock_movement_during_attack = lock_move
 	sprite.play(anim)
 	air_sfx.play()
 
@@ -121,41 +128,35 @@ func _do_attack(hitbox: Area2D, anim: String, active_time: float, cooldown: floa
 		sprite.play("idle")
 
 func punch() -> void:
-	_do_attack(punch_hitbox, "punch", 0.05, 0.25)
+	_do_attack(punch_hitbox, "punch", 0.05, 0.25, false)  # allow movement
 
 func kick() -> void:
-	_do_attack(kick_hitbox, "kick", 0.08, 0.25)
+	_do_attack(kick_hitbox, "kick", 0.08, 0.25, true)     # lock movement
 
 func jump() -> void:
 	if is_on_floor():
 		velocity.y = -jump_force
-		state = State.MOVE  # or add a JUMP state if you want
+		state = State.MOVE
 		sprite.play("jump")
 
 # ------------------------------------------------
 # HITBOX SIGNALS
-# ------------------------------------------------
 func _on_punchhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
 		return
 	if body.is_in_group("enemy"):
 		hit_sfx.play()
 		var dir := -1 if sprite.flip_h else 1
-		
+
 		# Aerial punch combo - more damage!
 		var damage = aerial_punch_damage if not is_on_floor() else punch_damage
 		var knockback = 350 if not is_on_floor() else 200
-		
+
 		body.take_damage(damage, dir, knockback)
 
 		var main = get_tree().current_scene
 		if main and main.has_method("get") and main.get("combat_system"):
-			main.combat_system.on_hit(
-				self,
-				body,
-				damage,
-				body.global_position
-			)
+			main.combat_system.on_hit(self, body, damage, body.global_position)
 
 func _on_kickhitbox_body_entered(body: Node) -> void:
 	if state != State.ATTACK:
@@ -167,16 +168,10 @@ func _on_kickhitbox_body_entered(body: Node) -> void:
 
 		var main = get_tree().current_scene
 		if main and main.has_method("get") and main.get("combat_system"):
-			main.combat_system.on_hit(
-				self,
-				body,
-				kick_damage,
-				body.global_position
-			)
+			main.combat_system.on_hit(self, body, kick_damage, body.global_position)
 
 # ------------------------------------------------
 # DAMAGE
-# ------------------------------------------------
 func take_damage(amount: int, knockback_dir: int, force: float) -> void:
 	if state == State.DEAD or is_dying:
 		return
@@ -230,36 +225,7 @@ func die() -> void:
 
 # ------------------------------------------------
 # PAUSE SUPPORT
-# ------------------------------------------------
 func _set_paused_state(paused: bool) -> void:
 	set_process(!paused)
 	set_physics_process(!paused)
 	set_process_input(!paused)
-
-# ------------------------------------------------
-# MOBILE CONTROL HOOKS
-# ------------------------------------------------
-func _on_AttackButton_pressed() -> void:
-	if state not in [State.DEAD, State.HIT, State.ATTACK]:
-		punch()
-
-func _on_KickButton_pressed() -> void:
-	if state not in [State.DEAD, State.HIT, State.ATTACK]:
-		kick()
-
-func _on_JumpButton_pressed() -> void:
-	if state not in [State.DEAD, State.HIT]:
-		jump()
-
-
-func _on_LeftButton_pressed() -> void:
-	Input.action_press("ui_left")
-
-func _on_LeftButton_released() -> void:
-	Input.action_release("ui_left")
-
-func _on_RightButton_pressed() -> void:
-	Input.action_press("ui_right")
-
-func _on_RightButton_released() -> void:
-	Input.action_release("ui_right")

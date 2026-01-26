@@ -44,6 +44,8 @@ func _ready():
 	# If your MobileControls.gd has a setup_controls() function, call it here:
 	if mobile_controls.has_method("setup_controls"):
 		mobile_controls.setup_controls()
+	if mobile_controls.has_method("adjust_button_sizes"):
+		mobile_controls.adjust_button_sizes()
 
 	# Remove static enemy
 	if enemy:
